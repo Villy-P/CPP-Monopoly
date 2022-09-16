@@ -1,0 +1,8 @@
+[user]
+    name = Villy-P
+    email = valeriuspetrini@gmail.com
+    username = Villy-P
+[init]
+    defaultBranch = main
+[web]
+    browser = google-chrome
