@@ -11,7 +11,11 @@ class Plot {
         std::unordered_map<std::string, std::string> stringProperties;
         std::unordered_map<std::string, int> intProperties;
 
-        Plot();
+        Plot(
+            std::unordered_set<std::string> flags,
+            std::unordered_map<std::string, std::string> stringProperties,
+            std::unordered_map<std::string, int> intProperties
+        );
 
         void displayTitleCard();
         std::string getRentWithHouseString();

@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+class Board;
+
 class Player {
     public:
         bool isMainPlayer;
@@ -15,9 +17,9 @@ class Player {
         int plotPosition = 0;
         std::vector<Plot> ownedPlots;
 
-        Player();
+        Player(bool isMainPlayer);
 
-        void movePlayer();
+        void movePlayer(Board& board);
         bool reduceMoney();
 };
 
