@@ -1,4 +1,4 @@
-#include "player.h"
+#include "player.hpp"
 
 #include <vector>
 #include <iostream>
@@ -11,7 +11,7 @@ Player::Player(bool isMainPlayer) {
     this->isMainPlayer = isMainPlayer;
 }
 
-void Player::movePlayer(Board& board) {
+void Player::movePlayer(Board& board, std::vector<Player> computers) {
     functions::clear();
     vector<unsigned char> dieRoll = board.rollDice();
     int squaresToMove = dieRoll[0] + dieRoll[1];
@@ -41,9 +41,9 @@ void Player::movePlayer(Board& board) {
     cout << this->name << " landed on " << nextSquareColor << nextSquareName << functions::ANSI_RESET << endl;
     if (board.getPlot(this->plotPosition + squaresToMove).flags.count("PROPERTYSQUARE")) {
         if (!functions::setContains(board.getPlot(this->plotPosition + squaresToMove).flags, "OWNEDPLOT")) {
+            int rentCost = board.getPlot(this->plotPosition + squaresToMove).intProperties.at("RENT");
+            cout << nextSquareColor << nextSquareName << " costs $" << rentCost << endl;
             if (this->isMainPlayer) {
-                int rentCost = board.getPlot(this->plotPosition + squaresToMove).intProperties.at("RENT");
-                cout << nextSquareColor << nextSquareName << " costs $" << rentCost << endl;
                 functions::printlnRed("You have $" + this->cash);
                 functions::printlnBlue("1: Buy it");
                 functions::printlnGreen("2: Auction it off");
@@ -51,17 +51,38 @@ void Player::movePlayer(Board& board) {
                 if (input == 1) {
                     if (this->reduceMoney(rentCost)) {
                         cout << "You bought " << nextSquareName << " and got a title card:" << endl;
-                        
+                        this->buyProperty(board, squaresToMove);
+                    } else {
+
                     }
+                } else {
+
+                }
+            } else {
+                float randomValue = (float) rand() / (float) RAND_MAX;
+                if (this->reduceMoney(rentCost) && randomValue > .35) {
+                    cout << this->name << "decided to buy " + nextSquareColor << nextSquareName << functions::ANSI_RESET << endl;
+                    this->buyProperty(board, squaresToMove);
+                } else {
+
                 }
             }
+        } else {
+            
         }
     }
 }
 
+void Player::buyProperty(Board& board, unsigned char squaresToMove) {
+    board.getPlot(this->plotPosition + squaresToMove).displayTitleCard();
+    board.getPlot(this->plotPosition + squaresToMove).flags.insert("OWNEDPLOT");
+    this->ownedPlots.push_back(board.getPlot(this->plotPosition + squaresToMove));
+    functions::readStringInput("");
+}
+
 bool Player::reduceMoney(int amount) {
     if (this->cash - amount < 0) {
-        functions::printlnRed("You don't have enough money!");
+        functions::printlnRed("It seems that you don't have enough money to buy this.");
         return false;
     }
     return true;

@@ -31,7 +31,6 @@ int main() {
     functions::clear();
     Board board;
     board.createPlots();
-    board.plots[1].displayTitleCard();
     Player player(true);
     functions::printlnBlue("Welcome to Monopoly!");
     functions::printlnGreen("What is your name?");
@@ -71,5 +70,5 @@ int main() {
     }
     functions::printlnGreen(firstMover.name + " will be moving first!");
     functions::readStringInput("");
-    firstMover.movePlayer(board);
+    firstMover.movePlayer(board, computers);
 }

@@ -13,11 +13,14 @@ class Player {
         std::string identifier;
         int cash = 1500;
         int plotPosition = 0;
+        int bid = 0;
+        bool isBidding = true;
         std::vector<Plot> ownedPlots;
 
         Player(bool isMainPlayer);
 
-        void movePlayer(Board& board);
+        void movePlayer(Board& board, std::vector<Player> computers);
+        void buyProperty(Board& board, unsigned char squaresToMove);
         bool reduceMoney(int amount);
 };
 

@@ -1,7 +1,7 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include "plot.h"
+#include "plot.hpp"
 
 #include <vector>
 #include <string>

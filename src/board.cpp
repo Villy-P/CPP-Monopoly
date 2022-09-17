@@ -1,4 +1,4 @@
-#include "board.h"
+#include "board.hpp"
 #include "plot.cpp"
 #include "functions.cpp"
 
