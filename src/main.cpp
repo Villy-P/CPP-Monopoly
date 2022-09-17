@@ -1,4 +1,3 @@
-#include "board.cpp"
 #include "player.cpp"
 
 #include <vector>
@@ -71,4 +70,5 @@ int main() {
     }
     functions::printlnGreen(firstMover.name + " will be moving first!");
     functions::readStringInput("");
+    firstMover.movePlayer(board);
 }

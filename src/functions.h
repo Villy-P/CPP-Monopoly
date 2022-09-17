@@ -1,6 +1,7 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
+#include <vector>
 #include <string>
 
 namespace functions {
@@ -17,6 +18,7 @@ namespace functions {
     std::string ANSI_ORANGE    = "\033[38;5;202m";
     std::string ANSI_PURPLE    = "\033[38;5;127m";
 
+    std::vector<std::string> split(const std::string &s, char delim);
     void clear();
     void printlnRed(std::string str);
     void printlnBlue(std::string str);

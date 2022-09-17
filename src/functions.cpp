@@ -3,6 +3,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <sstream>
 
 using namespace std;
 
@@ -16,6 +17,17 @@ void functions::printlnGreen(string str)   {cout << functions::ANSI_GREEN   << s
 void functions::printlnYellow(string str)  {cout << functions::ANSI_YELLOW  << str << functions::ANSI_RESET << endl;}
 void functions::printlnMagenta(string str) {cout << functions::ANSI_MAGENTA << str << functions::ANSI_RESET << endl;}
 void functions::printlnCyan(string str)    {cout << functions::ANSI_CYAN    << str << functions::ANSI_RESET << endl;}
+
+std::vector<std::string> functions::split(const std::string &s, char delim) {
+    stringstream ss(s);
+    string item;
+    vector<std::string> elems;
+    while (getline(ss, item, delim)) {
+        elems.push_back(item);
+        // elems.push_back(std::move(item)); // if C++11 (based on comment from @mchiasson)
+    }
+    return elems;
+}
 
 string functions::readStringInput(string prompt) {
     string returnString;

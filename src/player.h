@@ -1,12 +1,10 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "plot.h"
+#include "board.cpp"
 
 #include <string>
 #include <vector>
-
-class Board;
 
 class Player {
     public:
