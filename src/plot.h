@@ -18,7 +18,7 @@ class Plot {
         );
 
         void displayTitleCard();
-        std::string getRentWithHouseString();
+        std::string getRentWithHouseString(unsigned char number, std::string name, unsigned char titleCardLength);
 };
 
 #endif
