@@ -18,7 +18,7 @@ class Player {
         Player(bool isMainPlayer);
 
         void movePlayer(Board& board);
-        bool reduceMoney();
+        bool reduceMoney(int amount);
 };
 
 #endif

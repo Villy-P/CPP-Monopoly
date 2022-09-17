@@ -11,12 +11,27 @@ void functions::clear() {
     cout << "\033[2J" << endl;
 }
 
+string functions::center(const string s, const int w) {
+    stringstream ss, spaces;
+    int pad = w - s.size();                  // count excess room to pad
+    for(int i=0; i<pad/2; ++i)
+        spaces << " ";
+    ss << spaces.str() << s << spaces.str(); // format with padding
+    if(pad>0 && pad%2!=0)                    // if pad odd #, add 1 more space
+        ss << " ";
+    return ss.str();
+}
+
 void functions::printlnRed(string str)     {cout << functions::ANSI_RED     << str << functions::ANSI_RESET << endl;}
 void functions::printlnBlue(string str)    {cout << functions::ANSI_BLUE    << str << functions::ANSI_RESET << endl;}
 void functions::printlnGreen(string str)   {cout << functions::ANSI_GREEN   << str << functions::ANSI_RESET << endl;}
 void functions::printlnYellow(string str)  {cout << functions::ANSI_YELLOW  << str << functions::ANSI_RESET << endl;}
 void functions::printlnMagenta(string str) {cout << functions::ANSI_MAGENTA << str << functions::ANSI_RESET << endl;}
 void functions::printlnCyan(string str)    {cout << functions::ANSI_CYAN    << str << functions::ANSI_RESET << endl;}
+
+bool functions::setContains(std::unordered_set<std::string> set, std::string str) {
+    return set.count(str);
+}
 
 std::vector<std::string> functions::split(const std::string &s, char delim) {
     stringstream ss(s);

@@ -19,6 +19,10 @@ vector<unsigned char> Board::rollDice() {
     return vect;
 }
 
+Plot Board::getPlot(int index) {
+    return this->plots[index > this->plots.size() ? index - this->plots.size() : index];
+}
+
 void Board::createPlots() {
     ifstream plotData("C:\\Users\\lilyp\\OneDrive\\Documents\\Projects\\C++\\CPP-Monopoly\\src\\plotData.txt");
     Plot plot({}, {}, {});
@@ -53,7 +57,6 @@ void Board::createPlots() {
                 plot.intProperties.insert({{split[0], stoi(split[1])}});
                 getline(plotData, next);
             }
-            getline(plotData, next);
             // cout << next << endl;
             this->plots.push_back(plot);
             plot = Plot{{}, {}, {}};

@@ -15,6 +15,7 @@ class Board {
 
         std::vector<unsigned char> rollDice();
         std::string getStringProperty(int index, std::string propertyName);
+        Plot getPlot(int index);
         void createPlots();
 };
 

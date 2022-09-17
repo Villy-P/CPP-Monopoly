@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <unordered_set>
 
 namespace functions {
     std::string ANSI_RESET     = "\033[0m";
@@ -19,7 +20,9 @@ namespace functions {
     std::string ANSI_PURPLE    = "\033[38;5;127m";
 
     std::vector<std::string> split(const std::string &s, char delim);
+    bool setContains(std::unordered_set<std::string> set, std::string str);
     void clear();
+    std::string center(const std::string s, const int w);
     void printlnRed(std::string str);
     void printlnBlue(std::string str);
     void printlnGreen(std::string str);
