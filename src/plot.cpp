@@ -53,34 +53,41 @@ string Plot::getRentWithHouseString(unsigned char number, string name, unsigned 
 }
 
 void Plot::auction(Board& board, Player player, std::vector<Player> computers) {
-    player.bid = 0;
-    player.isBidding = true;
-    for (Player& computer : computers) {
-        computer.bid = 0;
-        computer.isBidding = true;
-    }
-    functions::printlnBlue("Auctioning has begun on the property: " + this->stringProperties.at("COLORCODE") + this->stringProperties.at("NAME") + "\033[0m");
-    functions::printlnBlue("The bid will begin at $1");
-    int maxBid = 1;
-    Player maxBidder = player;
+    vector<Player> players;
+    players.push_back(player);
+    for (Player computer : computers)
+        players.push_back(computer);
+    cout << "Bidding has started on the property " << this->stringProperties.at("COLORCODE") << this->stringProperties.at("NAME") << functions::ANSI_RESET << endl;
+    Player maxBidder(false);
     while (true) {
-        if (player.isBidding) {
-            functions::printlnRed("It's your turn to bid");
-            functions::printlnBlue("The max bid is " + to_string(maxBid));
-            functions::printlnCyan("You currently have $" + to_string(player.cash) + " and are bidding $" + to_string(playerBid));
-            functions::printlnBlue("Enter 0 if you don't want to bid.");
-            int input = functions::readIntInput(
-                "Enter a number that is 0 and greater that the max bid and less then the amount of cash you have minus the amount you are currently bidding>", 
-                maxBid, 
-                player.cash - playerBid
-            );
-            if (input == 0) {
-                player.isBidding = false;
-                functions::printlnRed("You have stopped bidding.");
+        cout << "The current bid is $" << to_string(maxBidder.bid) << endl;
+        if (this->playersStillBidding(players))
+            break;
+        for (Player user : players) {
+            if (!user.isBidding)
+                continue;
+            if (user.isMainPlayer) {
+                functions::printlnBlue("It's your turn to bid");
+                functions::printlnBlue("Your current bid is $" + to_string(user.bid));
+                int input = functions::readIntInput("Enter a number higher than the current bid minus your current bid (or 0 to stop bidding)>", 0, maxBidder.bid - user.bid);
+                if (input == 0) {
+                    functions::printlnRed("You have stopped bidding.");
+                    user.isBidding = false;
+                } else {
+                    user.bid += input;
+                    
+                }
             } else {
-                player.bid += input;
-                functions::printlnMagenta("Your bid has risen to " + to_string(playerBid));
+
             }
         }
     }
+}
+
+bool Plot::playersStillBidding(std::vector<Player> players) {
+    unsigned char playersStillBidding = 0;
+    for (Player p : players)
+        if (p.isBidding)
+            playersStillBidding++;
+    return playersStillBidding > 1;
 }

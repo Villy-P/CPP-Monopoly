@@ -41,7 +41,7 @@ void Player::movePlayer(Board& board, std::vector<Player> computers) {
     cout << this->name << " landed on " << nextSquareColor << nextSquareName << functions::ANSI_RESET << endl;
     if (board.getPlot(this->plotPosition + squaresToMove).flags.count("PROPERTYSQUARE")) {
         if (!functions::setContains(board.getPlot(this->plotPosition + squaresToMove).flags, "OWNEDPLOT")) {
-            int rentCost = board.getPlot(this->plotPosition + squaresToMove).intProperties.at("RENT");
+            int rentCost = board.getPlot(this->plotPosition + squaresToMove).intProperties.at("PRICE");
             cout << nextSquareColor << nextSquareName << " costs $" << rentCost << endl;
             if (this->isMainPlayer) {
                 functions::printlnRed("You have $" + this->cash);
@@ -53,7 +53,7 @@ void Player::movePlayer(Board& board, std::vector<Player> computers) {
                         cout << "You bought " << nextSquareName << " and got a title card:" << endl;
                         this->buyProperty(board, squaresToMove);
                     } else {
-
+                        board.getPlot(this->plotPosition + squaresToMove).auction();
                     }
                 } else {
 

@@ -20,6 +20,7 @@ class Plot {
         void displayTitleCard();
         std::string getRentWithHouseString(unsigned char number, std::string name, unsigned char titleCardLength);
         void auction(Board& board, Player player, std::vector<Player> computers);
+        bool playersStillBidding(std::vector<Player> players);
 };
 
 #endif
