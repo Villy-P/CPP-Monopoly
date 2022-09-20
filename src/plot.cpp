@@ -1,5 +1,4 @@
-#ifndef PLOT_CPP
-#define PLOT_CPP
+#pragma once
 
 #include "plot.hpp"
 
@@ -95,5 +94,3 @@ bool Plot::playersStillBidding(std::vector<Player> players) {
             playersStillBidding++;
     return playersStillBidding > 1;
 }
-
-#endif

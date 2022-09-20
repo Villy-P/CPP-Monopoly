@@ -1,5 +1,4 @@
-#ifndef FUNCTIONS_CPP
-#define FUNCTIONS_CPP
+#pragma once
 
 #include "functions.hpp"
 
@@ -85,5 +84,3 @@ int functions::readIntInput(string prompt, int min, int max) {
     }
     return x;
 }
-
-#endif

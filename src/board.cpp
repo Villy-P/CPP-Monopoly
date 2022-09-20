@@ -1,5 +1,4 @@
-#ifndef BOARD_CPP
-#define BOARD_CPP
+#pragma once
 
 #include "board.hpp"
 #include "plot.cpp"
@@ -76,5 +75,3 @@ string Board::getStringProperty(int index, string propertyName) {
         trueIndex = index;
     return this->plots.at(trueIndex).stringProperties.at(propertyName);
 }
-
-#endif
