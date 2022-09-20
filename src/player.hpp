@@ -1,7 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "board.cpp"
+#include "board.hpp"
 
 #include <string>
 #include <vector>

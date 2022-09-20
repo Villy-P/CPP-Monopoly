@@ -1,3 +1,6 @@
+#ifndef PLOT_CPP
+#define PLOT_CPP
+
 #include "plot.hpp"
 
 #include <unordered_set>
@@ -7,6 +10,7 @@
 #include <sstream>
 
 using namespace std;
+
 
 string center(const string s, const int w) {
     stringstream ss, spaces;
@@ -75,7 +79,7 @@ void Plot::auction(Board& board, Player player, std::vector<Player> computers) {
                     user.isBidding = false;
                 } else {
                     user.bid += input;
-                    
+
                 }
             } else {
 
@@ -91,3 +95,5 @@ bool Plot::playersStillBidding(std::vector<Player> players) {
             playersStillBidding++;
     return playersStillBidding > 1;
 }
+
+#endif

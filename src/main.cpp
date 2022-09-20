@@ -1,4 +1,6 @@
 #include "player.cpp"
+#include "board.hpp"
+#include "functions.hpp"
 
 #include <vector>
 #include <string>

@@ -1,3 +1,6 @@
+#ifndef BOARD_CPP
+#define BOARD_CPP
+
 #include "board.hpp"
 #include "plot.cpp"
 #include "functions.cpp"
@@ -6,6 +9,7 @@
 #include <string>
 #include <random>
 #include <fstream>
+#include <iostream>
 
 using namespace std;
 
@@ -24,7 +28,7 @@ Plot Board::getPlot(int index) {
 }
 
 void Board::createPlots() {
-    ifstream plotData("C:\\Users\\lilyp\\OneDrive\\Documents\\Projects\\C++\\CPP-Monopoly\\src\\plotData.txt");
+    ifstream plotData("C:\\Users\\Valerius Petrini Jr\\Documents\\CPP-Monopoly\\src\\plotData.txt");
     Plot plot({}, {}, {});
     if (plotData.is_open()) {
         while (plotData.good()) {
@@ -72,3 +76,5 @@ string Board::getStringProperty(int index, string propertyName) {
         trueIndex = index;
     return this->plots.at(trueIndex).stringProperties.at(propertyName);
 }
+
+#endif

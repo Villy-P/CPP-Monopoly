@@ -4,6 +4,10 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <string>
+#include <vector>
+
+#include "player.cpp"
+#include "board.hpp"
 
 class Plot {
     public:

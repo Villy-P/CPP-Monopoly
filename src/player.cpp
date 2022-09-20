@@ -1,4 +1,9 @@
+#ifndef PLAYER_CPP
+#define PLAYER_CPP
+
 #include "player.hpp"
+#include "functions.hpp"
+#include "board.cpp"
 
 #include <vector>
 #include <iostream>
@@ -24,53 +29,57 @@ void Player::movePlayer(Board& board, std::vector<Player> computers) {
     cout << "| " << to_string(dieRoll[0]) << " | | " << to_string(dieRoll[1]) << " |" << endl;
     cout << "+---+ +---+" << endl;
     cout << this->name << " moved " << to_string(squaresToMove) << " spaces from" << endl;
+    cout << " " << functions::ANSI_GREEN << string(board.getPlot(this->plotPosition).intProperties.at("HOUSES"), 'O') << functions::ANSI_RESET;
+    cout << " " << functions::ANSI_RED << string(board.getPlot(this->plotPosition).intProperties.at("HOTELS"), 'O') << functions::ANSI_RESET << endl;
     cout << currentSquareColor << "+" << string(currentSquareName.length() + 2, '-') << "+" << endl;
     cout << "| " << currentSquareName << " |" << endl;
     cout << "+" << string(currentSquareName.length() + 2, '-') << "+" << functions::ANSI_RESET << endl;
     cout << "To" << endl;
+    cout << " " << functions::ANSI_GREEN << string(board.getPlot(this->plotPosition + squaresToMove).intProperties.at("HOUSES"), 'O') << functions::ANSI_RESET;
+    cout << " " << functions::ANSI_RED << string(board.getPlot(this->plotPosition + squaresToMove).intProperties.at("HOTELS"), 'O') << functions::ANSI_RESET << endl;
     cout << nextSquareColor << "+" << string(nextSquareName.length() + 2, '-') << "+" << endl;
     cout << "| " << nextSquareName << " |" << endl;
     cout << "+" << string(nextSquareName.length() + 2, '-') << "+" << functions::ANSI_RESET << endl;
     for (unsigned char i = this->plotPosition; i < this->plotPosition + squaresToMove; i++) {
         Plot plot = board.getPlot(i);
         if (this->plotPosition != 0 && plot.flags.find("GOSQUARE") != plot.flags.end()) {
-            cout << this->name << " passes by GO. +$200";
+            cout << this->name << " passes by GO. +$200" << endl;
             this->cash += 200;
         }
     }
     cout << this->name << " landed on " << nextSquareColor << nextSquareName << functions::ANSI_RESET << endl;
-    if (board.getPlot(this->plotPosition + squaresToMove).flags.count("PROPERTYSQUARE")) {
-        if (!functions::setContains(board.getPlot(this->plotPosition + squaresToMove).flags, "OWNEDPLOT")) {
-            int rentCost = board.getPlot(this->plotPosition + squaresToMove).intProperties.at("PRICE");
-            cout << nextSquareColor << nextSquareName << " costs $" << rentCost << endl;
-            if (this->isMainPlayer) {
-                functions::printlnRed("You have $" + this->cash);
-                functions::printlnBlue("1: Buy it");
-                functions::printlnGreen("2: Auction it off");
-                int input = functions::readIntInput(">", 1, 2);
-                if (input == 1) {
-                    if (this->reduceMoney(rentCost)) {
-                        cout << "You bought " << nextSquareName << " and got a title card:" << endl;
-                        this->buyProperty(board, squaresToMove);
-                    } else {
-                        board.getPlot(this->plotPosition + squaresToMove).auction();
-                    }
-                } else {
+    // if (board.getPlot(this->plotPosition + squaresToMove).flags.count("PROPERTYSQUARE")) {
+    //     if (!functions::setContains(board.getPlot(this->plotPosition + squaresToMove).flags, "OWNEDPLOT")) {
+    //         int rentCost = board.getPlot(this->plotPosition + squaresToMove).intProperties.at("PRICE");
+    //         cout << nextSquareColor << nextSquareName << " costs $" << rentCost << endl;
+    //         if (this->isMainPlayer) {
+    //             functions::printlnRed("You have $" + this->cash);
+    //             functions::printlnBlue("1: Buy it");
+    //             functions::printlnGreen("2: Auction it off");
+    //             int input = functions::readIntInput(">", 1, 2);
+    //             if (input == 1) {
+    //                 if (this->reduceMoney(rentCost)) {
+    //                     cout << "You bought " << nextSquareName << " and got a title card:" << endl;
+    //                     this->buyProperty(board, squaresToMove);
+    //                 } else {
+    //                     // board.getPlot(this->plotPosition + squaresToMove).auction();
+    //                 }
+    //             } else {
 
-                }
-            } else {
-                float randomValue = (float) rand() / (float) RAND_MAX;
-                if (this->reduceMoney(rentCost) && randomValue > .35) {
-                    cout << this->name << "decided to buy " + nextSquareColor << nextSquareName << functions::ANSI_RESET << endl;
-                    this->buyProperty(board, squaresToMove);
-                } else {
+    //             }
+    //         } else {
+    //             float randomValue = (float) rand() / (float) RAND_MAX;
+    //             if (this->reduceMoney(rentCost) && randomValue > .35) {
+    //                 cout << this->name << "decided to buy " + nextSquareColor << nextSquareName << functions::ANSI_RESET << endl;
+    //                 this->buyProperty(board, squaresToMove);
+    //             } else {
 
-                }
-            }
-        } else {
-            
-        }
-    }
+    //             }
+    //         }
+    //     } else {
+
+    //     }
+    // }
 }
 
 void Player::buyProperty(Board& board, unsigned char squaresToMove) {
@@ -87,3 +96,5 @@ bool Player::reduceMoney(int amount) {
     }
     return true;
 }
+
+#endif

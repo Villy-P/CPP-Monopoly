@@ -1,3 +1,6 @@
+#ifndef FUNCTIONS_CPP
+#define FUNCTIONS_CPP
+
 #include "functions.hpp"
 
 #include <iostream>
@@ -82,3 +85,5 @@ int functions::readIntInput(string prompt, int min, int max) {
     }
     return x;
 }
+
+#endif

@@ -1,12 +1,11 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include "plot.hpp"
-
 #include <vector>
 #include <string>
 
 class Player;
+class Plot;
 
 class Board {
     public:
