@@ -7,12 +7,10 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <vector>
 
-using namespace std;
-
-
-string center(const string s, const int w) {
-    stringstream ss, spaces;
+std::string center(const std::string s, const int w) {
+    std::stringstream ss, spaces;
     int pad = w - s.size();                  // count excess room to pad
     for(int i=0; i<pad/2; ++i)
         spaces << " ";
@@ -22,56 +20,56 @@ string center(const string s, const int w) {
     return ss.str();
 }
 
-Plot::Plot(unordered_set<string> flags, unordered_map<string, string> stringProperties, unordered_map<string, int> intProperties) {
+plot::Plot::Plot(std::unordered_set<std::string> flags, std::unordered_map<std::string, std::string> stringProperties, std::unordered_map<std::string, int> intProperties) {
     this->flags = flags;
     this->stringProperties = stringProperties;
     this->intProperties = intProperties;
 }
 
-void Plot::displayTitleCard() {
+void plot::Plot::displayTitleCard() {
     unsigned char titleCardLength = 29;
-    string repeatedDash = string(titleCardLength, '-');
-    string repeatedSpace = string(titleCardLength, ' ');
-    cout << this->stringProperties.at("COLORCODE") << "+" << repeatedDash << "+" << endl;
-    cout << "|" << center("TITLE DEED", titleCardLength) << "|" << endl;
-    cout << "|" << center(this->stringProperties.at("NAME"), titleCardLength) << "|" << endl;
-    cout << "+" << repeatedDash << "+" << endl;
-    cout << "|" << center("RENT $" + to_string(this->intProperties.at("RENT")) + ".", titleCardLength) << "|" << endl;
-    cout << "|" << this->getRentWithHouseString(1, "RENTWITHONEHOUSE", titleCardLength) << "|" << endl;
-    cout << "|" << this->getRentWithHouseString(2, "RENTWITHTWOHOUSES", titleCardLength) << "|" << endl;
-    cout << "|" << this->getRentWithHouseString(3, "RENTWITHTHREEHOUSES", titleCardLength) << "|" << endl;
-    cout << "|" << this->getRentWithHouseString(4, "RENTWITHFOURHOUSES", titleCardLength) << "|" << endl;
-    cout << "|" << center("WITH HOTEL $" + to_string(this->intProperties.at("RENTWITHHOTEL")) + ".", titleCardLength) << "|" << endl;
-    cout << "|" << repeatedSpace << "|" << endl;
-    cout << "|" << center("MORTGAGE VALUE $" + to_string(this->intProperties.at("MORTGAGEVALUE")) + ".", titleCardLength) << "|" << endl;
-    cout << "|" << center("HOUSES COST $" + to_string(this->intProperties.at("HOUSESCOST")) + ". EACH", titleCardLength) << "|" << endl;
-    cout << "|";
-    cout << center("HOTELS, $" + to_string(this->intProperties.at("HOTELSCOST")) + ". PLUS " + to_string(this->intProperties.at("PLUSHOUSES")), titleCardLength);
-    cout << "|" << endl;
-    cout << "+" << repeatedDash << "+" << "\033[0m" << endl;
+    std::string repeatedDash = std::string(titleCardLength, '-');
+    std::string repeatedSpace = std::string(titleCardLength, ' ');
+    std::cout << this->stringProperties.at("COLORCODE") << "+" << repeatedDash << "+" << std::endl;
+    std::cout << "|" << center("TITLE DEED", titleCardLength) << "|" << std::endl;
+    std::cout << "|" << center(this->stringProperties.at("NAME"), titleCardLength) << "|" << std::endl;
+    std::cout << "+" << repeatedDash << "+" << std::endl;
+    std::cout << "|" << center("RENT $" + std::to_string(this->intProperties.at("RENT")) + ".", titleCardLength) << "|" << std::endl;
+    std::cout << "|" << this->getRentWithHouseString(1, "RENTWITHONEHOUSE", titleCardLength) << "|" << std::endl;
+    std::cout << "|" << this->getRentWithHouseString(2, "RENTWITHTWOHOUSES", titleCardLength) << "|" << std::endl;
+    std::cout << "|" << this->getRentWithHouseString(3, "RENTWITHTHREEHOUSES", titleCardLength) << "|" << std::endl;
+    std::cout << "|" << this->getRentWithHouseString(4, "RENTWITHFOURHOUSES", titleCardLength) << "|" << std::endl;
+    std::cout << "|" << center("WITH HOTEL $" + std::to_string(this->intProperties.at("RENTWITHHOTEL")) + ".", titleCardLength) << "|" << std::endl;
+    std::cout << "|" << repeatedSpace << "|" << std::endl;
+    std::cout << "|" << center("MORTGAGE VALUE $" + std::to_string(this->intProperties.at("MORTGAGEVALUE")) + ".", titleCardLength) << "|" << std::endl;
+    std::cout << "|" << center("HOUSES COST $" + std::to_string(this->intProperties.at("HOUSESCOST")) + ". EACH", titleCardLength) << "|" << std::endl;
+    std::cout << "|";
+    std::cout << center("HOTELS, $" + std::to_string(this->intProperties.at("HOTELSCOST")) + ". PLUS " + std::to_string(this->intProperties.at("PLUSHOUSES")), titleCardLength);
+    std::cout << "|" << std::endl;
+    std::cout << "+" << repeatedDash << "+" << "\033[0m" << std::endl;
 }
 
-string Plot::getRentWithHouseString(unsigned char number, string name, unsigned char titleCardLength) {
-    return " WITH " + to_string(number) + " HOUSE" + string(titleCardLength - 15 - to_string(this->intProperties.at(name)).length(), ' ') + "$" + to_string(this->intProperties.at(name)) + " ";
+std::string plot::Plot::getRentWithHouseString(unsigned char number, std::string name, unsigned char titleCardLength) {
+    return " WITH " + std::to_string(number) + " HOUSE" + std::string(titleCardLength - 15 - std::to_string(this->intProperties.at(name)).length(), ' ') + "$" + std::to_string(this->intProperties.at(name)) + " ";
 }
 
-void Plot::auction(Board& board, Player player, std::vector<Player> computers) {
-    vector<Player> players;
+void plot::Plot::auction(board::Board& board, player::Player player, std::vector<player::Player> computers) {
+    std::vector<player::Player> players;
     players.push_back(player);
-    for (Player computer : computers)
+    for (player::Player computer : computers)
         players.push_back(computer);
-    cout << "Bidding has started on the property " << this->stringProperties.at("COLORCODE") << this->stringProperties.at("NAME") << functions::ANSI_RESET << endl;
-    Player maxBidder(false);
+    std::cout << "Bidding has started on the property " << this->stringProperties.at("COLORCODE") << this->stringProperties.at("NAME") << functions::ANSI_RESET << std::endl;
+    player::Player maxBidder(false);
     while (true) {
-        cout << "The current bid is $" << to_string(maxBidder.bid) << endl;
+        std::cout << "The current bid is $" << std::to_string(maxBidder.bid) << std::endl;
         if (this->playersStillBidding(players))
             break;
-        for (Player user : players) {
+        for (player::Player user : players) {
             if (!user.isBidding)
                 continue;
             if (user.isMainPlayer) {
                 functions::printlnBlue("It's your turn to bid");
-                functions::printlnBlue("Your current bid is $" + to_string(user.bid));
+                functions::printlnBlue("Your current bid is $" + std::to_string(user.bid));
                 int input = functions::readIntInput("Enter a number higher than the current bid minus your current bid (or 0 to stop bidding)>", 0, maxBidder.bid - user.bid);
                 if (input == 0) {
                     functions::printlnRed("You have stopped bidding.");
@@ -87,9 +85,9 @@ void Plot::auction(Board& board, Player player, std::vector<Player> computers) {
     }
 }
 
-bool Plot::playersStillBidding(std::vector<Player> players) {
+bool plot::Plot::playersStillBidding(std::vector<player::Player> players) {
     unsigned char playersStillBidding = 0;
-    for (Player p : players)
+    for (player::Player p : players)
         if (p.isBidding)
             playersStillBidding++;
     return playersStillBidding > 1;

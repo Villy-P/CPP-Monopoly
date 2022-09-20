@@ -10,37 +10,35 @@
 #include <fstream>
 #include <iostream>
 
-using namespace std;
-
-vector<unsigned char> Board::rollDice() {
-    random_device random;
-    mt19937 generate(random());
-    uniform_int_distribution<> distr(1, 6);
+std::vector<unsigned char> board::Board::rollDice() {
+    std::random_device random;
+    std::mt19937 generate(random());
+    std::uniform_int_distribution<> distr(1, 6);
     unsigned char die1 = distr(generate);
     unsigned char die2 = distr(generate);
-    vector vect{die1, die2};
+    std::vector vect{die1, die2};
     return vect;
 }
 
-Plot Board::getPlot(int index) {
+plot::Plot board::Board::getPlot(int index) {
     return this->plots[index > this->plots.size() ? index - this->plots.size() : index];
 }
 
-void Board::createPlots() {
-    ifstream plotData("C:\\Users\\Valerius Petrini Jr\\Documents\\CPP-Monopoly\\src\\plotData.txt");
-    Plot plot({}, {}, {});
+void board::Board::createPlots() {
+    std::ifstream plotData("C:\\Users\\Valerius Petrini Jr\\Documents\\CPP-Monopoly\\src\\plotData.txt");
+    plot::Plot plot({}, {}, {});
     if (plotData.is_open()) {
         while (plotData.good()) {
-            string next;
-            getline(plotData, next); // Get [FLAGS]
-            getline(plotData, next); // Get first flag (OR STRING_PROPERTIES)
+            std::string next;
+            std::getline(plotData, next); // Get [FLAGS]
+            std::getline(plotData, next); // Get first flag (OR STRING_PROPERTIES)
             while (next != "[STRING_PROPERTIES]") {
                 plot.flags.insert(next);
-                getline(plotData, next);
+                std::getline(plotData, next);
             }
-            getline(plotData, next);
+            std::getline(plotData, next);
             while (next != "[INT_PROPERTIES]") {
-                vector<string> split = functions::split(next, '=');
+                std::vector<std::string> split = functions::split(next, '=');
                 if (split[0] == "COLORCODE") {
                     if (split[1] == "WHITE")
                         split[1] = functions::ANSI_WHITE;
@@ -52,22 +50,22 @@ void Board::createPlots() {
                         split[1] = functions::ANSI_CYAN;
                 }
                 plot.stringProperties.insert({{split[0], split[1]}});
-                getline(plotData, next);
+                std::getline(plotData, next);
             }
-            getline(plotData, next);
+            std::getline(plotData, next);
             while (next != "-NEWPLOT-") {
-                vector<string> split = functions::split(next, '=');
+                std::vector<std::string> split = functions::split(next, '=');
                 plot.intProperties.insert({{split[0], stoi(split[1])}});
                 getline(plotData, next);
             }
             // cout << next << endl;
             this->plots.push_back(plot);
-            plot = Plot{{}, {}, {}};
+            plot = plot::Plot{{}, {}, {}};
         }
     }
 }
 
-string Board::getStringProperty(int index, string propertyName) {
+std::string board::Board::getStringProperty(int index, std::string propertyName) {
     int trueIndex;
     if (index > this->plots.size())
         trueIndex = index - this->plots.size();

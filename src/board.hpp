@@ -1,21 +1,23 @@
-#ifndef BOARD_H
-#define BOARD_H
+#ifndef SRC_BOARD_H_
+#define SRC_BOARD_H_
 
 #include <vector>
 #include <string>
 
-class Player;
-class Plot;
+namespace player{class Player;}
+namespace plot{class Plot;}
 
-class Board {
-    public:
-        std::vector<Player> players;
-        std::vector<Plot> plots;
+namespace board {
+    class Board {
+        public:
+            std::vector<player::Player> players;
+            std::vector<plot::Plot> plots;
 
-        std::vector<unsigned char> rollDice();
-        std::string getStringProperty(int index, std::string propertyName);
-        Plot getPlot(int index);
-        void createPlots();
-};
+            std::vector<unsigned char> rollDice();
+            std::string getStringProperty(int index, std::string propertyName);
+            plot::Plot getPlot(int index);
+            void createPlots();
+    };
+}
 
 #endif

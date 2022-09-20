@@ -1,5 +1,5 @@
-#ifndef FUNCTIONS_H
-#define FUNCTIONS_H
+#ifndef SRC_FUNCTIONS_H_
+#define SRC_FUNCTIONS_H_
 
 #include <vector>
 #include <string>

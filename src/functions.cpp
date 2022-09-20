@@ -7,14 +7,12 @@
 #include <string>
 #include <sstream>
 
-using namespace std;
-
 void functions::clear() {
-    cout << "\033[2J" << endl;
+    std::cout << "\033[2J" << std::endl;
 }
 
-string functions::center(const string s, const int w) {
-    stringstream ss, spaces;
+std::string functions::center(const std::string s, const int w) {
+    std::stringstream ss, spaces;
     int pad = w - s.size();                  // count excess room to pad
     for(int i=0; i<pad/2; ++i)
         spaces << " ";
@@ -24,21 +22,21 @@ string functions::center(const string s, const int w) {
     return ss.str();
 }
 
-void functions::printlnRed(string str)     {cout << functions::ANSI_RED     << str << functions::ANSI_RESET << endl;}
-void functions::printlnBlue(string str)    {cout << functions::ANSI_BLUE    << str << functions::ANSI_RESET << endl;}
-void functions::printlnGreen(string str)   {cout << functions::ANSI_GREEN   << str << functions::ANSI_RESET << endl;}
-void functions::printlnYellow(string str)  {cout << functions::ANSI_YELLOW  << str << functions::ANSI_RESET << endl;}
-void functions::printlnMagenta(string str) {cout << functions::ANSI_MAGENTA << str << functions::ANSI_RESET << endl;}
-void functions::printlnCyan(string str)    {cout << functions::ANSI_CYAN    << str << functions::ANSI_RESET << endl;}
+void functions::printlnRed(std::string str)     {std::cout << functions::ANSI_RED     << str << functions::ANSI_RESET << std::endl;}
+void functions::printlnBlue(std::string str)    {std::cout << functions::ANSI_BLUE    << str << functions::ANSI_RESET << std::endl;}
+void functions::printlnGreen(std::string str)   {std::cout << functions::ANSI_GREEN   << str << functions::ANSI_RESET << std::endl;}
+void functions::printlnYellow(std::string str)  {std::cout << functions::ANSI_YELLOW  << str << functions::ANSI_RESET << std::endl;}
+void functions::printlnMagenta(std::string str) {std::cout << functions::ANSI_MAGENTA << str << functions::ANSI_RESET << std::endl;}
+void functions::printlnCyan(std::string str)    {std::cout << functions::ANSI_CYAN    << str << functions::ANSI_RESET << std::endl;}
 
 bool functions::setContains(std::unordered_set<std::string> set, std::string str) {
     return set.count(str);
 }
 
 std::vector<std::string> functions::split(const std::string &s, char delim) {
-    stringstream ss(s);
-    string item;
-    vector<std::string> elems;
+    std::stringstream ss(s);
+    std::string item;
+    std::vector<std::string> elems;
     while (getline(ss, item, delim)) {
         elems.push_back(item);
         // elems.push_back(std::move(item)); // if C++11 (based on comment from @mchiasson)
@@ -46,41 +44,41 @@ std::vector<std::string> functions::split(const std::string &s, char delim) {
     return elems;
 }
 
-string functions::readStringInput(string prompt) {
-    string returnString;
-    cout << prompt;
-    getline(cin, returnString);
+std::string functions::readStringInput(std::string prompt) {
+    std::string returnString;
+    std::cout << prompt;
+    std::getline(std::cin, returnString);
     return returnString;
 }
 
-string functions::readCharInput(string prompt) {
-    string returnString;
-    cout << prompt;
-    getline(cin, returnString);
+std::string functions::readCharInput(std::string prompt) {
+    std::string returnString;
+    std::cout << prompt;
+    std::getline(std::cin, returnString);
     while (returnString.length() != 1) {
-        cout << "Enter a character>";
-        getline(cin, returnString);
+        std::cout << "Enter a character>";
+        std::getline(std::cin, returnString);
     }
     return returnString;
 }
 
-bool functions::tryParse(string &input, int &output) {
+bool functions::tryParse(std::string &input, int &output) {
     try {
         output = stoi(input);
-    } catch (invalid_argument) {
+    } catch (std::invalid_argument) {
         return false;
     }
     return true;
 }
 
-int functions::readIntInput(string prompt, int min, int max) {
-    string input;
-    cout << prompt;
+int functions::readIntInput(std::string prompt, int min, int max) {
+    std::string input;
+    std::cout << prompt;
     int x;
-    getline(cin, input);
+    std::getline(std::cin, input);
     while (!tryParse(input, x) || x < min || x > max) {
-        cout << "Enter a number between " << min << " & " << max << ">";
-        getline(cin, input);
+        std::cout << "Enter a number between " << min << " & " << max << ">";
+        std::getline(std::cin, input);
     }
     return x;
 }

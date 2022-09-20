@@ -8,46 +8,44 @@
 #include <vector>
 #include <iostream>
 
-using namespace std;
-
 namespace functions {};
 
-Player::Player(bool isMainPlayer) {
+player::Player::Player(bool isMainPlayer) {
     this->isMainPlayer = isMainPlayer;
 }
 
-void Player::movePlayer(Board& board, std::vector<Player> computers) {
+void player::Player::movePlayer(board::Board& board, std::vector<player::Player> computers) {
     functions::clear();
-    vector<unsigned char> dieRoll = board.rollDice();
+    std::vector<unsigned char> dieRoll = board.rollDice();
     int squaresToMove = dieRoll[0] + dieRoll[1];
-    string currentSquareColor =  board.getStringProperty(this->plotPosition, "COLORCODE");
-    string currentSquareName = board.getStringProperty(this->plotPosition, "NAME");
-    string nextSquareColor = board.getStringProperty((this->plotPosition + squaresToMove), "COLORCODE");
-    string nextSquareName = board.getStringProperty(this->plotPosition + squaresToMove, "NAME");
+    std::string currentSquareColor =  board.getStringProperty(this->plotPosition, "COLORCODE");
+    std::string currentSquareName = board.getStringProperty(this->plotPosition, "NAME");
+    std::string nextSquareColor = board.getStringProperty((this->plotPosition + squaresToMove), "COLORCODE");
+    std::string nextSquareName = board.getStringProperty(this->plotPosition + squaresToMove, "NAME");
     functions::printlnBlue(this->name + " rolled:");
-    cout << "+---+ +---+" << endl;
-    cout << "| " << to_string(dieRoll[0]) << " | | " << to_string(dieRoll[1]) << " |" << endl;
-    cout << "+---+ +---+" << endl;
-    cout << this->name << " moved " << to_string(squaresToMove) << " spaces from" << endl;
-    cout << " " << functions::ANSI_GREEN << string(board.getPlot(this->plotPosition).intProperties.at("HOUSES"), 'O') << functions::ANSI_RESET;
-    cout << " " << functions::ANSI_RED << string(board.getPlot(this->plotPosition).intProperties.at("HOTELS"), 'O') << functions::ANSI_RESET << endl;
-    cout << currentSquareColor << "+" << string(currentSquareName.length() + 2, '-') << "+" << endl;
-    cout << "| " << currentSquareName << " |" << endl;
-    cout << "+" << string(currentSquareName.length() + 2, '-') << "+" << functions::ANSI_RESET << endl;
-    cout << "To" << endl;
-    cout << " " << functions::ANSI_GREEN << string(board.getPlot(this->plotPosition + squaresToMove).intProperties.at("HOUSES"), 'O') << functions::ANSI_RESET;
-    cout << " " << functions::ANSI_RED << string(board.getPlot(this->plotPosition + squaresToMove).intProperties.at("HOTELS"), 'O') << functions::ANSI_RESET << endl;
-    cout << nextSquareColor << "+" << string(nextSquareName.length() + 2, '-') << "+" << endl;
-    cout << "| " << nextSquareName << " |" << endl;
-    cout << "+" << string(nextSquareName.length() + 2, '-') << "+" << functions::ANSI_RESET << endl;
+    std::cout << "+---+ +---+" << std::endl;
+    std::cout << "| " << std::to_string(dieRoll[0]) << " | | " << std::to_string(dieRoll[1]) << " |" << std::endl;
+    std::cout << "+---+ +---+" << std::endl;
+    std::cout << this->name << " moved " << std::to_string(squaresToMove) << " spaces from" << std::endl;
+    std::cout << " " << functions::ANSI_GREEN << std::string(board.getPlot(this->plotPosition).intProperties.at("HOUSES"), 'O') << functions::ANSI_RESET;
+    std::cout << " " << functions::ANSI_RED << std::string(board.getPlot(this->plotPosition).intProperties.at("HOTELS"), 'O') << functions::ANSI_RESET << std::endl;
+    std::cout << currentSquareColor << "+" << std::string(currentSquareName.length() + 2, '-') << "+" << std::endl;
+    std::cout << "| " << currentSquareName << " |" << std::endl;
+    std::cout << "+" << std::string(currentSquareName.length() + 2, '-') << "+" << functions::ANSI_RESET << std::endl;
+    std::cout << "To" << std::endl;
+    std::cout << " " << functions::ANSI_GREEN << std::string(board.getPlot(this->plotPosition + squaresToMove).intProperties.at("HOUSES"), 'O') << functions::ANSI_RESET;
+    std::cout << " " << functions::ANSI_RED << std::string(board.getPlot(this->plotPosition + squaresToMove).intProperties.at("HOTELS"), 'O') << functions::ANSI_RESET << std::endl;
+    std::cout << nextSquareColor << "+" << std::string(nextSquareName.length() + 2, '-') << "+" << std::endl;
+    std::cout << "| " << nextSquareName << " |" << std::endl;
+    std::cout << "+" << std::string(nextSquareName.length() + 2, '-') << "+" << functions::ANSI_RESET << std::endl;
     for (unsigned char i = this->plotPosition; i < this->plotPosition + squaresToMove; i++) {
-        Plot plot = board.getPlot(i);
+        plot::Plot plot = board.getPlot(i);
         if (this->plotPosition != 0 && plot.flags.find("GOSQUARE") != plot.flags.end()) {
-            cout << this->name << " passes by GO. +$200" << endl;
+            std::cout << this->name << " passes by GO. +$200" << std::endl;
             this->cash += 200;
         }
     }
-    cout << this->name << " landed on " << nextSquareColor << nextSquareName << functions::ANSI_RESET << endl;
+    std::cout << this->name << " landed on " << nextSquareColor << nextSquareName << functions::ANSI_RESET << std::endl;
     // if (board.getPlot(this->plotPosition + squaresToMove).flags.count("PROPERTYSQUARE")) {
     //     if (!functions::setContains(board.getPlot(this->plotPosition + squaresToMove).flags, "OWNEDPLOT")) {
     //         int rentCost = board.getPlot(this->plotPosition + squaresToMove).intProperties.at("PRICE");
@@ -82,14 +80,14 @@ void Player::movePlayer(Board& board, std::vector<Player> computers) {
     // }
 }
 
-void Player::buyProperty(Board& board, unsigned char squaresToMove) {
+void player::Player::buyProperty(board::Board& board, unsigned char squaresToMove) {
     board.getPlot(this->plotPosition + squaresToMove).displayTitleCard();
     board.getPlot(this->plotPosition + squaresToMove).flags.insert("OWNEDPLOT");
     this->ownedPlots.push_back(board.getPlot(this->plotPosition + squaresToMove));
     functions::readStringInput("");
 }
 
-bool Player::reduceMoney(int amount) {
+bool player::Player::reduceMoney(int amount) {
     if (this->cash - amount < 0) {
         functions::printlnRed("It seems that you don't have enough money to buy this.");
         return false;

@@ -1,5 +1,5 @@
-#ifndef PLOT_H
-#define PLOT_H
+#ifndef SRC_PLOT_H_
+#define SRC_PLOT_H_
 
 #include <unordered_set>
 #include <unordered_map>
@@ -9,22 +9,24 @@
 #include "player.cpp"
 #include "board.hpp"
 
-class Plot {
-    public:
-        std::unordered_set<std::string> flags;
-        std::unordered_map<std::string, std::string> stringProperties;
-        std::unordered_map<std::string, int> intProperties;
+namespace plot {
+    class Plot {
+        public:
+            std::unordered_set<std::string> flags;
+            std::unordered_map<std::string, std::string> stringProperties;
+            std::unordered_map<std::string, int> intProperties;
 
-        Plot(
-            std::unordered_set<std::string> flags,
-            std::unordered_map<std::string, std::string> stringProperties,
-            std::unordered_map<std::string, int> intProperties
-        );
+            Plot(
+                std::unordered_set<std::string> flags,
+                std::unordered_map<std::string, std::string> stringProperties,
+                std::unordered_map<std::string, int> intProperties
+            );
 
-        void displayTitleCard();
-        std::string getRentWithHouseString(unsigned char number, std::string name, unsigned char titleCardLength);
-        void auction(Board& board, Player player, std::vector<Player> computers);
-        bool playersStillBidding(std::vector<Player> players);
-};
+            void displayTitleCard();
+            std::string getRentWithHouseString(unsigned char number, std::string name, unsigned char titleCardLength);
+            void auction(board::Board& board, player::Player player, std::vector<player::Player> computers);
+            bool playersStillBidding(std::vector<player::Player> players);
+    };
+}
 
 #endif
