@@ -76,7 +76,7 @@ void plot::Plot::auction(board::Board& board, player::Player player, std::vector
                     user.isBidding = false;
                 } else {
                     user.bid += input;
-
+                    
                 }
             } else {
 

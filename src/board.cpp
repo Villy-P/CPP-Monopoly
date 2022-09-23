@@ -59,7 +59,6 @@ void board::Board::createPlots() {
                 plot.intProperties.insert({{split[0], stoi(split[1])}});
                 getline(plotData, next);
             }
-            // cout << next << endl;
             this->plots.push_back(plot);
             plot = plot::Plot{{}, {}, {}};
         }
