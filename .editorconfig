@@ -2,7 +2,7 @@ lines (10 sloc)  188 Bytes
 
 root = true
 
-[*]
+[*.(cpp, hpp)]
 end_of_line = lf
 charset = utf-8
 trim_trailing_whitespace = true
