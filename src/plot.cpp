@@ -20,6 +20,10 @@ std::string center(const std::string s, const int w) {
     return ss.str();
 }
 
+std::string leftRightAdjust(std::string leftContent, std::string rightContent, unsigned char length) {
+    return " " + leftContent + std::string(length - 2 - leftContent.length() - rightContent.length(), ' ') + rightContent + " ";
+}
+
 plot::Plot::Plot(std::unordered_set<std::string> flags, std::unordered_map<std::string, std::string> stringProperties, std::unordered_map<std::string, int> intProperties) {
     this->flags = flags;
     this->stringProperties = stringProperties;
@@ -34,18 +38,23 @@ void plot::Plot::displayTitleCard() {
     std::cout << "|" << center("TITLE DEED", titleCardLength) << "|" << std::endl;
     std::cout << "|" << center(this->stringProperties.at("NAME"), titleCardLength) << "|" << std::endl;
     std::cout << "+" << repeatedDash << "+" << std::endl;
-    std::cout << "|" << center("RENT $" + std::to_string(this->intProperties.at("RENT")) + ".", titleCardLength) << "|" << std::endl;
-    std::cout << "|" << this->getRentWithHouseString(1, "RENTWITHONEHOUSE", titleCardLength) << "|" << std::endl;
-    std::cout << "|" << this->getRentWithHouseString(2, "RENTWITHTWOHOUSES", titleCardLength) << "|" << std::endl;
-    std::cout << "|" << this->getRentWithHouseString(3, "RENTWITHTHREEHOUSES", titleCardLength) << "|" << std::endl;
-    std::cout << "|" << this->getRentWithHouseString(4, "RENTWITHFOURHOUSES", titleCardLength) << "|" << std::endl;
-    std::cout << "|" << center("WITH HOTEL $" + std::to_string(this->intProperties.at("RENTWITHHOTEL")) + ".", titleCardLength) << "|" << std::endl;
+    std::cout << "|" << leftRightAdjust("Rent", "$" + std::to_string(this->intProperties.at("RENT")), titleCardLength) << "|" << std::endl;
+    std::cout << this->stringProperties.at("COLORCODE") << "|" << leftRightAdjust("Rent with color set", "$" + std::to_string(this->intProperties.at("RENTWITHCOLORSET")), titleCardLength) << "|" << std::endl;
+    std::cout << "|" << leftRightAdjust("Rent with 1 home", "$" + std::to_string(this->intProperties.at("RENTWITHONEHOUSE")), titleCardLength) << "|" << std::endl;
+    std::cout << "|" << leftRightAdjust("Rent with 2 houses", "$" + std::to_string(this->intProperties.at("RENTWITHTWOHOUSES")), titleCardLength) << "|" << std::endl;
+    std::cout << "|" << leftRightAdjust("Rent with 3 houses", "$" + std::to_string(this->intProperties.at("RENTWITHTHREEHOUSES")), titleCardLength) << "|" << std::endl;
+    std::cout << "|" << leftRightAdjust("Rent with 4 houses", "$" + std::to_string(this->intProperties.at("RENTWITHFOURHOUSES")), titleCardLength) << "|" << std::endl;
+    std::cout << "|" << leftRightAdjust("Rent with hotel", "$" + std::to_string(this->intProperties.at("RENTWITHHOTEL")), titleCardLength) << "|" << std::endl;
+    std::cout << "+" << repeatedDash << "+" << std::endl;
+    std::cout << "|" << leftRightAdjust("Houses cost", "$" + std::to_string(this->intProperties.at("HOUSESCOST")) + " each", titleCardLength) << "|" << std::endl;
+    std::cout << "|" << leftRightAdjust("Hotels cost", "$" + std::to_string(this->intProperties.at("HOTELSCOST")) + " each", titleCardLength) << "|" << std::endl;
+    std::cout << "|" << leftRightAdjust("", "(plus 4 houses)", titleCardLength) << "|" << std::endl;
+    std::cout << "+" << repeatedDash << "+" << std::endl;
+    std::cout << "|" << center("MORTGAGE", titleCardLength) << "|" << std::endl;
+    std::cout << "|" << center("VALUE $" + std::to_string(this->intProperties.at("MORTGAGEVALUE")), titleCardLength) << "|" << std::endl;
     std::cout << "|" << repeatedSpace << "|" << std::endl;
-    std::cout << "|" << center("MORTGAGE VALUE $" + std::to_string(this->intProperties.at("MORTGAGEVALUE")) + ".", titleCardLength) << "|" << std::endl;
-    std::cout << "|" << center("HOUSES COST $" + std::to_string(this->intProperties.at("HOUSESCOST")) + ". EACH", titleCardLength) << "|" << std::endl;
-    std::cout << "|";
-    std::cout << center("HOTELS, $" + std::to_string(this->intProperties.at("HOTELSCOST")) + ". PLUS " + std::to_string(this->intProperties.at("PLUSHOUSES")), titleCardLength);
-    std::cout << "|" << std::endl;
+    std::cout << "|" << center("TO UNMORTGAGE,", titleCardLength) << "|" << std::endl;
+    std::cout << "|" << center("PAY $" + std::to_string(this->intProperties.at("UNMORTGAGEVALUE")), titleCardLength) << "|" << std::endl;
     std::cout << "+" << repeatedDash << "+" << "\033[0m" << std::endl;
 }
 

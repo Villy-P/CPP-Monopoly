@@ -26,7 +26,7 @@ plot::Plot board::Board::getPlot(int index) {
 }
 
 void board::Board::createPlots() {
-    std::ifstream plotData("C:\\Users\\Valerius Petrini Jr\\Documents\\CPP-Monopoly\\src\\plotData.txt");
+    std::ifstream plotData("plotData.txt");
     plot::Plot plot({}, {}, {});
     if (plotData.is_open()) {
         while (plotData.good()) {
@@ -66,12 +66,7 @@ void board::Board::createPlots() {
 }
 
 std::string board::Board::getStringProperty(int index, std::string propertyName) {
-    int trueIndex;
-    if (index > this->plots.size())
-        trueIndex = index - this->plots.size();
-    else
-        trueIndex = index;
-    return this->plots.at(trueIndex).stringProperties.at(propertyName);
+    return this->plots.at(index > this->plots.size() ? index - this->plots.size() : index).stringProperties.at(propertyName);
 }
 
 #endif
