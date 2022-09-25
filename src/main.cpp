@@ -17,12 +17,12 @@ std::string colorMenu() {
     functions::printlnMagenta("5: Magenta");
     functions::printlnCyan("6: Cyan");
     switch (functions::readIntInput(">", 1, 6)) {
-        case 1: return functions::ANSI_RED;
-        case 2: return functions::ANSI_GREEN;
-        case 3: return functions::ANSI_YELLOW;
-        case 4: return functions::ANSI_BLUE;
-        case 5: return functions::ANSI_MAGENTA;
-        case 6: return functions::ANSI_CYAN;
+        case 1:     return functions::ANSI_RED;
+        case 2:     return functions::ANSI_GREEN;
+        case 3:     return functions::ANSI_YELLOW;
+        case 4:     return functions::ANSI_BLUE;
+        case 5:     return functions::ANSI_MAGENTA;
+        case 6:     return functions::ANSI_CYAN;
     }
     return functions::ANSI_WHITE;
 }
