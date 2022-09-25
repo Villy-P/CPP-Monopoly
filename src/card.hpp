@@ -16,12 +16,11 @@ namespace card {
             static void shuffleDeck();
 
             bool isChance;
-            std::string name;
             std::string description;
             std::unordered_set<std::string> flags;
             std::unordered_map<std::string, std::string> properties;
 
-            Card(bool isChance, std::string name, std::string description, std::unordered_set<std::string> flags, std::unordered_map<std::string, std::string> properties);
+            Card(bool isChance, std::string description, std::unordered_set<std::string> flags, std::unordered_map<std::string, std::string> properties);
     };
 }
 
