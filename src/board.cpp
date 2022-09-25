@@ -22,7 +22,7 @@ std::vector<unsigned char> board::Board::rollDice() {
 }
 
 plot::Plot board::Board::getPlot(int index) {
-    return this->plots[index > this->plots.size() ? index - this->plots.size() : index];
+    return this->plots[index >= (this->plots.size()) ? index - this->plots.size() : index];
 }
 
 void board::Board::createPlots() {
@@ -66,7 +66,11 @@ void board::Board::createPlots() {
 }
 
 std::string board::Board::getStringProperty(int index, std::string propertyName) {
-    return this->plots.at(index > this->plots.size() ? index - this->plots.size() : index).stringProperties.at(propertyName);
+    return this->plots.at(index >= (this->plots.size()) ? index - this->plots.size() : index).stringProperties.at(propertyName);
+}
+
+int board::Board::getIntProperty(int index, std::string propertyName) {
+    return this->plots.at(index >= (this->plots.size()) ? index - this->plots.size() : index).intProperties.at(propertyName);
 }
 
 #endif

@@ -19,9 +19,9 @@ namespace card {
             std::string name;
             std::string description;
             std::unordered_set<std::string> flags;
-            std::unordered_map<std::string, std::string> stringProperties;
+            std::unordered_map<std::string, std::string> properties;
 
-            Card(bool isChance, std::string name, std::string description, std::unordered_set<std::string> flags, std::unordered_map<std::string, std::string> stringProperties);
+            Card(bool isChance, std::string name, std::string description, std::unordered_set<std::string> flags, std::unordered_map<std::string, std::string> properties);
     };
 }
 
