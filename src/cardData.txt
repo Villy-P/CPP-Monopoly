@@ -1,4 +1,3 @@
--NEWCARD-
 TYPE=CHANCE
 DESC=BANK PAYS YOU DIVIDEND OF $50
 [FLAGS]
@@ -120,3 +119,120 @@ DESC=ADVANCE TO BOARDWALK
 ADVANCETO
 [PROPERTIES]
 ADVANCEINDEX=39
+-NEWCARD-
+TYPE=CHEST
+DESC=You go to the local school's car wash fundraiser--but you forget to close your windows! PAY $100.
+[FLAGS]
+MONEYCHANGE
+[PROPERTIES]
+MONEYCHANGE=-100
+-NEWCARD-
+TYPE=CHEST
+DESC=You help your neighbor bring in her groceries. She makes you lunch to say thanks!
+[FLAGS]
+MONEYCHANGE
+[PROPERTIES]
+MONEYCHANGE=20
+-NEWCARD-
+TYPE=CHEST
+DESC=You buy a few bags of cookies from that school bake sale. Yum! PAY $50.
+[FLAGS]
+MONEYCHANGE
+[PROPERTIES]
+MONEYCHANGE=-50
+-NEWCARD-
+TYPE=CHEST
+DESC=You set aside time every week to hang out with your elderly neighbor--you've heard some amazing stories! COLLECT $100.
+[FLAGS]
+MONEYCHANGE
+[PROPERTIES]
+MONEYCHANGE=100
+-NEWCARD-
+TYPE=CHEST
+DESC=You help buid a new school playground--then you get to test the slide! COLLECT $100.
+[FLAGS]
+MONEYCHANGE
+[PROPERTIES]
+MONEYCHANGE=100
+-NEWCARD-
+TYPE=CHEST
+DESC=Your fuzzy friends at the animal shelter will be thankfull for your donation. PAY $50.
+[FLAGS]
+MONEYCHANGE
+[PROPERTIES]
+MONEYCHANGE=-50
+-NEWCARD-
+TYPE=CHEST
+DESC=You help your neighbors clean up their yards after a big storm. COLLECT $200.
+[FLAGS]
+MONEYCHANGE
+[PROPERTIES]
+MONEYCHANGE=200
+-NEWCARD-
+TYPE=CHEST
+DESC=Just when you think you can't go another step, you finish that foot race--and raise money for your local hospital! ADVANCE TO GO. COLLECT $200.
+[FLAGS]
+ADVANCETO
+MONEYCHANGE
+[PROPERTIES]
+ADVANCEINDEX=0
+MONEYCHANGE=200
+-NEWCARD-
+TYPE=CHEST
+DESC=You should have volunteered for that home improvement project--you would have learned valuable skills! FOR EACH HOUSE YOU OWN, PAY $40. FOR EACH HOTEL YOU OWN, PAY $115.
+[FLAGS]
+REPAIRHOUSES
+REPAIRHOTELS
+[PROPERTIES]
+REPAIRHOUSESCOST=40
+REPAIRHOTELSCOST=115
+-NEWCARD-
+TYPE=CHEST
+DESC=You volunteer at a blood drive. There are free cookies! COLLECT $10.
+[FLAGS]
+MONEYCHANGE
+[PROPERTIES]
+MONEYCHANGE=10
+-NEWCARD-
+TYPE=CHEST
+DESC=You organize a group to clean up your town's walking path. COLLECT $50.
+[FLAGS]
+MONEYCHANGE
+[PROPERTIES]
+MONEYCHANGE=50
+-NEWCARD-
+TYPE=CHEST
+DESC=You spend the day playing games with kids at a local children's hospital. COLLECT $100.
+[FLAGS]
+MONEYCHANGE
+[PROPERTIES]
+MONEYCHANGE=100
+-NEWCARD-
+TYPE=CHEST
+DESC=You organize a block party so people on your street can get to know each other. COLLECT $10 FROM EACH PLAYER.
+[FLAGS]
+COLLECTFROMEACH
+[PROPERTIES]
+COLLECTFROMEACHAMOUNT=10
+-NEWCARD-
+TYPE=CHEST
+DESC=You organize a bake sale for your local school.
+[FLAGS]
+MONEYCHANGE
+[PROPERTIES]
+MONEYCHANGE=25
+-NEWCARD-
+TYPE=CHEST
+DESC=Blasting music late at night? Your neighbors do not approve. GO TO JAIL. GO DIRECTLY TO JAIL. DO NOT PASS GO. DO NOT COLLECT $200.
+[FLAGS]
+ADVANCETO
+GOTOJAIL
+[PROPERTIES]
+ADVANCEINDEX=10
+-NEWCARD-
+TYPE=CHANCE
+DESC=You rescue a puppy--and you feel rescued, too! GET OUT OF JAIL FREE. This card may be kept until needed, traded, or sold.
+[FLAGS]
+GETOUTOFJAILFREECARD
+[PROPERTIES]
+-NEWCARD-
