@@ -13,10 +13,9 @@
 #include <random>
 
 void card::Card::createCards() {
-    std::ifstream cardData("\\src\\cardData.txt");
+    std::ifstream cardData("cardData.txt");
     card::Card card(true, "", {}, {});
     if (cardData.is_open()) {
-    std::cout << "GOT HERE";
         while (cardData.good()) {
             std::string next;
             std::getline(cardData, next);
@@ -36,6 +35,7 @@ void card::Card::createCards() {
                 getline(cardData, next);
             }
             card.isChance ? card::Card::chanceCards.push_back(card) : card::Card::chestCards.push_back(card);
+            std::cout << card::Card::chanceCards.size() << std::endl;
             card = card::Card(true, "", {}, {});
         }
     }
@@ -48,7 +48,7 @@ void card::Card::shuffleDeck() {
 }
 
 void card::Card::drawChanceCard() {
-    card::Card card = *functions::select_randomly(card::Card::chanceCards.begin(), card::Card::chestCards.end());
+    card::Card card = card::Card::chanceCards[rand() % (card::Card::chanceCards.size() + 1)];
     std::vector<std::string> displaySentence = functions::split(card.description, ' ');
     unsigned char lengthOfEach = displaySentence.size() / 5;
     std::cout << "+----------------------------+" << std::endl;
@@ -65,7 +65,7 @@ void card::Card::drawChanceCard() {
         for (unsigned char j = 0; j < lengthOfEach; j++) {
             str += displaySentence[j];
         }
-        std::cout << "+" << functions::center(str, 28) << "+" << std::endl;
+        std::cout << "|" << functions::center(str, 28) << "|" << std::endl;
     }
     std::cout << "+----------------------------+" << std::endl;
 }

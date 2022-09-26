@@ -32,8 +32,7 @@ int main(void) {
     functions::clear();
     card::Card::createCards();
     card::Card::shuffleDeck();
-    card::Card card(true, "Wow this is cool", {}, {});
-    card.drawChanceCard();
+    card::Card::drawChanceCard();
     board::Board board;
     board.createPlots();
     player::Player player(true);

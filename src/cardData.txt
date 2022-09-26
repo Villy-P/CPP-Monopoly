@@ -230,7 +230,7 @@ GOTOJAIL
 [PROPERTIES]
 ADVANCEINDEX=10
 -NEWCARD-
-TYPE=CHANCE
+TYPE=CHEST
 DESC=You rescue a puppy--and you feel rescued, too! GET OUT OF JAIL FREE. This card may be kept until needed, traded, or sold.
 [FLAGS]
 GETOUTOFJAILFREECARD
