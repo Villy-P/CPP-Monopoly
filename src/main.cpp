@@ -32,7 +32,8 @@ int main(void) {
     functions::clear();
     card::Card::createCards();
     card::Card::shuffleDeck();
-    // std::cout << card::Card::chanceCards[0].description << std::endl;
+    card::Card card(true, "Wow this is cool", {}, {});
+    card.drawChanceCard();
     board::Board board;
     board.createPlots();
     player::Player player(true);

@@ -13,9 +13,10 @@
 #include <random>
 
 void card::Card::createCards() {
-    std::ifstream cardData("cardData.txt");
+    std::ifstream cardData("\\src\\cardData.txt");
     card::Card card(true, "", {}, {});
     if (cardData.is_open()) {
+    std::cout << "GOT HERE";
         while (cardData.good()) {
             std::string next;
             std::getline(cardData, next);
