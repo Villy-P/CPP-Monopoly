@@ -9,6 +9,8 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <fstream>
+#include <algorithm>
+#include <random>
 
 void card::Card::createCards() {
     std::ifstream cardData("cardData.txt");
@@ -36,6 +38,11 @@ void card::Card::createCards() {
             card = card::Card(true, "", {}, {});
         }
     }
+}
+void card::Card::shuffleDeck() {
+    std::default_random_engine rng = std::default_random_engine {};
+    std::shuffle(std::begin(card::Card::chanceCards), std::end(card::Card::chanceCards), rng);
+    std::shuffle(std::begin(card::Card::chestCards), std::end(card::Card::chestCards), rng);
 }
 
 card::Card::Card(bool isChance, std::string description, std::unordered_set<std::string> flags, std::unordered_map<std::string, std::string> properties) {
