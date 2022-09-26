@@ -26,9 +26,10 @@ plot::Plot board::Board::getPlot(int index) {
 }
 
 void board::Board::createPlots() {
-    std::ifstream plotData("Text Files\\plotData.txt");
+    std::ifstream plotData("plotData.txt");
     plot::Plot plot({}, {}, {});
     if (plotData.is_open()) {
+        std::cout << ">_>";
         while (plotData.good()) {
             std::string next;
             std::getline(plotData, next); // Get [FLAGS]

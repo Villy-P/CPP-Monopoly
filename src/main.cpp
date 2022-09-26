@@ -1,6 +1,7 @@
 #include "player.cpp"
-#include "board.hpp"
+#include "board.cpp"
 #include "functions.hpp"
+#include "card.cpp"
 
 #include <vector>
 #include <string>
@@ -29,6 +30,9 @@ std::string colorMenu() {
 
 int main(void) {
     functions::clear();
+    card::Card::createCards();
+    card::Card::shuffleDeck();
+    // std::cout << card::Card::chanceCards[0].description << std::endl;
     board::Board board;
     board.createPlots();
     player::Player player(true);
