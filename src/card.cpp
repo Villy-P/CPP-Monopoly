@@ -13,7 +13,7 @@
 #include <random>
 
 void card::Card::createCards() {
-    std::ifstream cardData("cardData.txt");
+    std::ifstream cardData("Text Files\\cardData.txt");
     card::Card card(true, "", {}, {});
     if (cardData.is_open()) {
         while (cardData.good()) {
