@@ -5,6 +5,8 @@
 #include <string>
 #include <unordered_set>
 
+#include "card.hpp"
+
 namespace functions {
     std::string ANSI_RESET     = "\033[0m";
     std::string ANSI_RED       = "\033[31m";
@@ -20,6 +22,7 @@ namespace functions {
     std::string ANSI_PURPLE    = "\033[38;5;127m";
 
     std::vector<std::string> split(const std::string &s, char delim);
+    std::vector<card::Card> shuffle(std::vector<card::Card> vec);
     bool setContains(std::unordered_set<std::string> set, std::string str);
     void clear();
     std::string center(const std::string s, const int w);

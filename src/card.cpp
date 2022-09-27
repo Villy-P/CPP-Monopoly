@@ -12,6 +12,9 @@
 #include <algorithm>
 #include <random>
 
+std::vector<card::Card> card::Card::chanceCards;
+std::vector<card::Card> card::Card::chestCards;
+
 void card::Card::createCards() {
     std::ifstream cardData("cardData.txt");
     card::Card card(true, "", {}, {});
@@ -35,29 +38,22 @@ void card::Card::createCards() {
                 getline(cardData, next);
             }
             card.isChance ? card::Card::chanceCards.push_back(card) : card::Card::chestCards.push_back(card);
-            std::cout << card::Card::chanceCards.size() << std::endl;
-            card = card::Card(true, "", {}, {});
+                card = card::Card(true, "", {}, {});
         }
     }
 }
 
-void card::Card::shuffleDeck() {
-    std::default_random_engine rng = std::default_random_engine {};
-    std::shuffle(std::begin(card::Card::chanceCards), std::end(card::Card::chanceCards), rng);
-    std::shuffle(std::begin(card::Card::chestCards), std::end(card::Card::chestCards), rng);
-}
-
 void card::Card::drawChanceCard() {
-    card::Card card = card::Card::chanceCards[rand() % (card::Card::chanceCards.size() + 1)];
+    card::Card card = card::Card::chanceCards[0];
     std::vector<std::string> displaySentence = functions::split(card.description, ' ');
     unsigned char lengthOfEach = displaySentence.size() / 5;
-    std::cout << "+----------------------------+" << std::endl;
-    std::cout << "|            OOOOOO          |" << std::endl;
-    std::cout << "|            O    O          |" << std::endl;
-    std::cout << "|              OOOO          |" << std::endl;
-    std::cout << "|              O             |" << std::endl;
-    std::cout << "|              .             |" << std::endl;
-    std::cout << "+----------------------------+" << std::endl;
+    std::cout << "+------------------------------+" << std::endl;
+    std::cout << "|            OOOOOO            |" << std::endl;
+    std::cout << "|            O    O            |" << std::endl;
+    std::cout << "|              OOOO            |" << std::endl;
+    std::cout << "|              O               |" << std::endl;
+    std::cout << "|              .               |" << std::endl;
+    std::cout << "+------------------------------+" << std::endl;
     functions::readStringInput("");
     std::cout << "+----------------------------+" << std::endl;
     for (unsigned char i = 0; i < 5; i++) {

@@ -9,8 +9,8 @@
 namespace card {
     class Card {
         public:
-            inline static std::vector<card::Card> chanceCards;
-            inline static std::vector<card::Card> chestCards;
+            static std::vector<card::Card> chanceCards;
+            static std::vector<card::Card> chestCards;
 
             static void createCards();
             static void shuffleDeck();

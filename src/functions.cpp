@@ -8,6 +8,7 @@
 #include <sstream>
 #include  <random>
 #include  <iterator>
+#include <algorithm>
 
 namespace functions {
     template<typename Iter, typename RandomGenerator>
@@ -23,6 +24,13 @@ namespace functions {
         static std::mt19937 gen(rd());
         return functions::select_randomly(start, end, gen);
     }
+}
+
+std::vector<card::Card> functions::shuffle(std::vector<card::Card> vec) {
+    static auto rng = std::default_random_engine {};
+    std::shuffle(std::begin(vec), std::end(vec), rng);
+    return vec; // this is a copy of the vector
+
 }
 
 void functions::clear() {

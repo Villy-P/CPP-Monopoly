@@ -31,7 +31,6 @@ std::string colorMenu() {
 int main(void) {
     functions::clear();
     card::Card::createCards();
-    card::Card::shuffleDeck();
     card::Card::drawChanceCard();
     board::Board board;
     board.createPlots();
