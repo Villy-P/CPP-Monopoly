@@ -12,6 +12,8 @@ namespace card_managment {
             std::vector<card::Card> chestCards;
 
             void shuffleDecks();
+            void drawChanceCard();
+            void createCards();
     };
 }
 
