@@ -46,7 +46,7 @@ void card_managment::CardManagment::createCards() {
 }
 
 void card_managment::CardManagment::drawChanceCard() {
-    card::Card card = this->chanceCards[3];
+    card::Card card = this->chanceCards[0];
     std::vector<std::string> displaySentence = functions::split(card.description, ' ');
     unsigned char lengthOfEach = displaySentence.size() / 5;
     unsigned char extraLetters = displaySentence.size() % 5;
@@ -76,6 +76,8 @@ void card_managment::CardManagment::drawChanceCard() {
         count++;
     }
     std::cout << "+----------------------------+" << std::endl;
+    this->chanceCards.erase(this->chanceCards.begin());
+    this->chanceCards.push_back(card);
 }
 
 #endif

@@ -34,7 +34,8 @@ int main(void) {
     card_managment::CardManagment cardManager;
     cardManager.createCards();
     cardManager.shuffleDecks();
-    cardManager.drawChanceCard();
+    while (true)
+        cardManager.drawChanceCard();
     board::Board board;
     board.createPlots();
     player::Player player(true);
