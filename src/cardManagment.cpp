@@ -74,4 +74,35 @@ void card_managment::CardManagment::drawChanceCard() {
     std::cout << this->chanceCards.size() << std::endl;
 }
 
+void card_managment::CardManagment::drawChestCard() {
+    card::Card card = this->chestCards[0];
+    std::vector<std::string> displaySentence = functions::split(card.description, ' ');
+    unsigned char lengthOfEach = displaySentence.size() / 5;
+    unsigned char extraLetters = displaySentence.size() % 5;
+    std::cout << "+---------------------------------------------+" << std::endl;
+    std::cout << "|                      +------+-+             |" << std::endl;
+    std::cout << "|                     /      / /              |" << std::endl;
+    std::cout << "|                    .^__/\\_._.               |" << std::endl;
+    std::cout << "|                  +````````+V+               |" << std::endl;
+    std::cout << "|                  +________+.+               |" << std::endl;
+    std::cout << "+---------------------------------------------+" << std::endl;
+    functions::readStringInput("");
+    std::cout << "+----------------------------------------------+" << std::endl;
+    for (unsigned char start = 0, end = lengthOfEach; start < displaySentence.size(); start = end, end = start + lengthOfEach) {
+        if (extraLetters) {
+            end++;
+            extraLetters--;
+        }
+        std::string str = "";
+        for (unsigned char i = start; i < end; i++)
+            str +=  displaySentence[i] + " ";
+        str.pop_back();
+        std::cout << "|" << functions::center(str, 46) << "|" << std::endl;
+    }
+    std::cout << "+----------------------------------------------+" << std::endl;
+    this->chestCards.pop_front();
+    this->chestCards.push_back(card);
+    std::cout << this->chestCards.size() << std::endl;
+}
+
 #endif

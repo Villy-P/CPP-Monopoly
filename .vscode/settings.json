@@ -69,7 +69,8 @@
         "xlocmon": "cpp",
         "xloctime": "cpp",
         "xtree": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "deque": "cpp"
     },
     "cSpell.words": [
         "HOUSESCOST",

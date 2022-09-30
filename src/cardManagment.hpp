@@ -13,6 +13,7 @@ namespace card_managment {
 
             void shuffleDecks();
             void drawChanceCard();
+            void drawChestCard();
             void createCards();
     };
 }
