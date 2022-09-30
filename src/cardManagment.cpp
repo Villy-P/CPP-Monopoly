@@ -83,7 +83,7 @@ void card_managment::CardManagment::drawChestCard() {
     std::cout << "|                      +------+-+             |" << std::endl;
     std::cout << "|                     /      / /              |" << std::endl;
     std::cout << "|                    .^__/\\_._.               |" << std::endl;
-    std::cout << "|                  +````````+V+               |" << std::endl;
+    std::cout << "|                  +--------+V+               |" << std::endl;
     std::cout << "|                  +________+.+               |" << std::endl;
     std::cout << "+---------------------------------------------+" << std::endl;
     functions::readStringInput("");
