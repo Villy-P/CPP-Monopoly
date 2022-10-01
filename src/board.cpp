@@ -49,6 +49,12 @@ void board::Board::createPlots() {
                         split[1] = functions::ANSI_DARK_CYAN;
                     else if (split[1] == "CYAN")
                         split[1] = functions::ANSI_CYAN;
+                    else if (split[1] == "ORANGE")
+                        split[1] = functions::ANSI_ORANGE;
+                    else if (split[1] == "MAGENTA")
+                        split[1] = functions::ANSI_MAGENTA;
+                    else if (split[1] == "YELLOW")
+                        split[1] = functions::ANSI_YELLOW;
                 }
                 plot.stringProperties.insert({{split[0], split[1]}});
                 std::getline(plotData, next);
