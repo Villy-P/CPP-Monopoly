@@ -55,6 +55,12 @@ void board::Board::createPlots() {
                         split[1] = functions::ANSI_MAGENTA;
                     else if (split[1] == "YELLOW")
                         split[1] = functions::ANSI_YELLOW;
+                    else if (split[1] == "RED")
+                        split[1] = functions::ANSI_RED;
+                    else if (split[1] == "BLUE")
+                        split[1] = functions::ANSI_BLUE;
+                    else if (split[1] == "GREEN")
+                        split[1] = functions::ANSI_GREEN;
                 }
                 plot.stringProperties.insert({{split[0], split[1]}});
                 std::getline(plotData, next);
