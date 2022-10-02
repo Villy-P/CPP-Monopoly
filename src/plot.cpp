@@ -72,6 +72,12 @@ void plot::Plot::displayUtilityCard() {
     std::cout << "|" << center("If both Utilities are owned,", titleCardLength) << "|" << std::endl;
     std::cout << "|" << center("rent is 10 times amount", titleCardLength) << "|" << std::endl;
     std::cout << "|" << center("shown on dice.", titleCardLength) << "|" << std::endl;
+    std::cout << "+" << repeatedDash << "+" << std::endl;
+    std::cout << "|" << center("MORTGAGE", titleCardLength) << "|" << std::endl;
+    std::cout << "|" << center("VALUE $" + std::to_string(this->intProperties.at("MORTGAGEVALUE")), titleCardLength) << "|" << std::endl;
+    std::cout << "|" << repeatedSpace << "|" << std::endl;
+    std::cout << "|" << center("TO UNMORTGAGE,", titleCardLength) << "|" << std::endl;
+    std::cout << "|" << center("PAY $" + std::to_string(this->intProperties.at("UNMORTGAGEVALUE")), titleCardLength) << "|" << std::endl;
     std::cout << "+" << repeatedDash << "+" << "\033[0m" << std::endl;
 }
 
@@ -86,6 +92,12 @@ void plot::Plot::displayRailroadCard() {
     std::cout << "|" << leftRightAdjust("If 2 Railroads are owned", "$50", titleCardLength) << "|" << std::endl;
     std::cout << "|" << leftRightAdjust("If 3 Railroads are owned", "$100", titleCardLength) << "|" << std::endl;
     std::cout << "|" << leftRightAdjust("If 4 Railroads are owned", "$200", titleCardLength) << "|" << std::endl;
+    std::cout << "+" << repeatedDash << "+" << std::endl;
+    std::cout << "|" << center("MORTGAGE", titleCardLength) << "|" << std::endl;
+    std::cout << "|" << center("VALUE $" + std::to_string(this->intProperties.at("MORTGAGEVALUE")), titleCardLength) << "|" << std::endl;
+    std::cout << "|" << repeatedSpace << "|" << std::endl;
+    std::cout << "|" << center("TO UNMORTGAGE,", titleCardLength) << "|" << std::endl;
+    std::cout << "|" << center("PAY $" + std::to_string(this->intProperties.at("UNMORTGAGEVALUE")), titleCardLength) << "|" << std::endl;
     std::cout << "+" << repeatedDash << "+" << std::endl;
 }
 
