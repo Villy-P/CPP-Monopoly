@@ -21,9 +21,9 @@ namespace player {
 
             Player(bool isMainPlayer);
 
-            void movePlayer(board::Board& board, std::vector<Player> computers);
+            void movePlayer(board::Board& board, Player mainPlayer, std::vector<Player> computers);
             void buyProperty(board::Board& board, unsigned char squaresToMove);
-            void reduceMoney(int amount, std::vector<player::Player> computers, bool doesOwe);
+            void reduceMoney(int amount, board::Board& board, Player mainPlayer, std::vector<player::Player> computers, bool doesOwe, Player oweTo);
             int moneyCanMake();
     };
 }

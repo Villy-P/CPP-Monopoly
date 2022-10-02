@@ -16,7 +16,7 @@ player::Player::Player(bool isMainPlayer) {
     this->isMainPlayer = isMainPlayer;
 }
 
-void player::Player::movePlayer(board::Board& board, std::vector<player::Player> computers) {
+void player::Player::movePlayer(board::Board& board, player::Player mainPlayer, std::vector<player::Player> computers) {
     functions::clear();
     std::vector<unsigned char> dieRoll = board.rollDice();
     int squaresToMove = dieRoll[0] + dieRoll[1];
@@ -85,7 +85,7 @@ void player::Player::movePlayer(board::Board& board, std::vector<player::Player>
     functions::readStringInput("");
     this->plotPosition += squaresToMove;
     this->plotPosition = this->plotPosition >= (board.plots.size()) ? this->plotPosition - board.plots.size() : this->plotPosition;
-    this->movePlayer(board, computers);
+    this->movePlayer(board, mainPlayer, computers);
 }
 
 void player::Player::buyProperty(board::Board& board, unsigned char squaresToMove) {
@@ -95,7 +95,7 @@ void player::Player::buyProperty(board::Board& board, unsigned char squaresToMov
     functions::readStringInput("");
 }
 
-void player::Player::reduceMoney(int amount, std::vector<player::Player> computers, bool doesOwe) {
+void player::Player::reduceMoney(int amount, board::Board& board, player::Player mainPlayer, std::vector<player::Player> computers, bool doesOwe, player::Player oweTo) {
     if (this->cash - amount < 0) {
         if (this->isMainPlayer) {
             functions::printlnRed("It seems that you don't have enough money to buy this.");
@@ -141,18 +141,88 @@ void player::Player::reduceMoney(int amount, std::vector<player::Player> compute
                 functions::printlnYellow("If you sell a hotel, you get half the value back and 4 houses get placed on that square");
                 functions::printlnRed("To mortgage a property, you first need to sell all hotels and houses on it. To unmortage a property, you must pay the amount listed on the title card.");
                 functions::printlnGreen("If someone lands on a unmortaged property, they don't have to pay rent.");
+                displayProperties:
+                if (this->cash >= amount) {
+                    functions::printlnGreen("You can now pay the amount!");
+                    this->cash -= amount;
+                    return;
+                }
                 functions::printlnRed("Here are your properties:");
                 for (int i = 0; i < this->ownedPlots.size(); i++) {
                     plot::Plot p = this->ownedPlots[i];
-                    std::cout << p.stringProperties.at("COLORCODE") << p.stringProperties.at("NAME");
-                    std::cout << " with a mortgage value of " << std::to_string(p.intProperties.at("MORTGAGEVALUE"));
-                    std::cout << " and a total of " << std::to_string(p.intProperties.at("HOUSES")) << " houses and ";
-                    std::cout << std::to_string(p.intProperties.at("HOTELS")) << " hotels." << functions::ANSI_RESET << std::endl;
+                    if (!functions::setContains(p.flags, "MORTGAGED")) {
+                        std::cout << p.stringProperties.at("COLORCODE") << std::to_string(i) << p.stringProperties.at("NAME");
+                        std::cout << " with a mortgage value of " << std::to_string(p.intProperties.at("MORTGAGEVALUE"));
+                        std::cout << " and a total of " << std::to_string(p.intProperties.at("HOUSES")) << " houses and ";
+                        std::cout << std::to_string(p.intProperties.at("HOTELS")) << " hotels." << functions::ANSI_RESET << std::endl;
+                    }
+                }
+                functions::printlnRed("Enter the corresponding number to either morgage a property or sell hotels/houses");
+                pay:
+                int input = functions::readIntInput(">", 0, this->ownedPlots.size() - 1);
+                plot::Plot pickedPlot = this->ownedPlots[input];
+                if (functions::setContains(pickedPlot.flags, "MORTGAGED")) {
+                    functions::printlnRed("That property is mortgaged. Try again");
+                    goto pay;
+                }
+                if (pickedPlot.intProperties.at("HOTELS") > 0) {
+                    functions::printlnRed("You got " + std::to_string(pickedPlot.intProperties.at("HOTELSCOST") / 2) + " for selling the hotel.");
+                    this->cash += pickedPlot.intProperties.at("HOTELSCOST") / 2;
+                    pickedPlot.intProperties.at("HOTELS") = 0;
+                    pickedPlot.intProperties.at("HOUSES") = 4;
+                    goto displayProperties;
+                } else if (pickedPlot.intProperties.at("HOUSES") > 0) {
+                    for (plot::Plot p : board.plots) {
+                        if (functions::setContains(p.flags, "PROPERTYSQUARE") && p.stringProperties.at("COLORCODE") == pickedPlot.stringProperties.at("COLORCODE")) {
+                            if (p.intProperties.at("HOUSES") < pickedPlot.intProperties.at("HOUSES") - 1) {
+                                functions::printlnRed("You need to sell houses equally!");
+                                goto displayProperties;
+                            }
+                        }
+                    }
+                    pickedPlot.intProperties.at("HOUSES") -= 1;
+                    this->cash += pickedPlot.intProperties.at("HOUSESCOST") / 2;
+                    goto displayProperties;
+                } else {
+                    pickedPlot.flags.insert("MORTGAGED");
+                    this->cash += pickedPlot.intProperties.at("MORTGAGEVALUE");
+                    goto displayProperties;
                 }
             }
         } else {
+            if (this->moneyCanMake() < amount) {
 
+            } else {
+                if (this->getOutOfJailFreeCards > 0) {
+                    functions::printlnBlue(this->name + " needs money, so he offers to sell you " + std::to_string(this->getOutOfJailFreeCards) + " get out of jail free cards.");
+                    functions::printlnBlue("He will sell them to you for $" + std::to_string(this->cash - this->moneyCanMake()));
+                    functions::printlnBlue("Enter 1 to accept and 2 to reject (Rejecting will cause the computer to go bankrupt)");
+                    int input = functions::readIntInput(">", 1, 2);
+                    if (input == 1) {
+                        functions::printlnBlue("You got the cards");
+                        this->cash += this->cash - this->moneyCanMake();
+                        mainPlayer.cash -= this->cash - this->moneyCanMake();
+                        mainPlayer.getOutOfJailFreeCards += this->getOutOfJailFreeCards;
+                        this->getOutOfJailFreeCards = 0;
+                    } else {
+                        bankrupt:
+                        functions::printlnCyan(this->name + " has gone bankrupt.");
+                        computers.erase(computers.begin() + (std::find(computers.begin(), computers.end(), this) - computers.begin()));
+                        if (doesOwe)
+                            for (plot::Plot p : this->ownedPlots)
+                                oweTo.ownedPlots.push_back(p);
+                        else
+                            for (plot::Plot p : this->ownedPlots)
+                                p.auction(board, mainPlayer, computers);
+                        return;
+                    }
+                } else {
+                    goto bankrupt;
+                }
+            }
         }
+    } else {
+        this->cash -= amount;
     }
 }
 
