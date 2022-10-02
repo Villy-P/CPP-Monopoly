@@ -141,6 +141,14 @@ void player::Player::reduceMoney(int amount, std::vector<player::Player> compute
                 functions::printlnYellow("If you sell a hotel, you get half the value back and 4 houses get placed on that square");
                 functions::printlnRed("To mortgage a property, you first need to sell all hotels and houses on it. To unmortage a property, you must pay the amount listed on the title card.");
                 functions::printlnGreen("If someone lands on a unmortaged property, they don't have to pay rent.");
+                functions::printlnRed("Here are your properties:");
+                for (int i = 0; i < this->ownedPlots.size(); i++) {
+                    plot::Plot p = this->ownedPlots[i];
+                    std::cout << p.stringProperties.at("COLORCODE") << p.stringProperties.at("NAME");
+                    std::cout << " with a mortgage value of " << std::to_string(p.intProperties.at("MORTGAGEVALUE"));
+                    std::cout << " and a total of " << std::to_string(p.intProperties.at("HOUSES")) << " houses and ";
+                    std::cout << std::to_string(p.intProperties.at("HOTELS")) << " hotels." << functions::ANSI_RESET << std::endl;
+                }
             }
         } else {
 
