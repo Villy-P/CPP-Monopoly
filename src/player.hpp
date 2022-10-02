@@ -17,12 +17,14 @@ namespace player {
             int bid = 0;
             bool isBidding = true;
             std::vector<plot::Plot> ownedPlots;
+            unsigned char getOutOfJailFreeCards = 0;
 
             Player(bool isMainPlayer);
 
             void movePlayer(board::Board& board, std::vector<Player> computers);
             void buyProperty(board::Board& board, unsigned char squaresToMove);
-            bool reduceMoney(int amount);
+            void reduceMoney(int amount, std::vector<player::Player> computers, bool doesOwe);
+            int moneyCanMake();
     };
 }
 

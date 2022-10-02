@@ -4,9 +4,11 @@
 #include "player.hpp"
 #include "functions.hpp"
 #include "board.cpp"
+#include "plot.hpp"
 
 #include <vector>
 #include <iostream>
+#include <limits>
 
 namespace functions {};
 
@@ -93,12 +95,67 @@ void player::Player::buyProperty(board::Board& board, unsigned char squaresToMov
     functions::readStringInput("");
 }
 
-bool player::Player::reduceMoney(int amount) {
+void player::Player::reduceMoney(int amount, std::vector<player::Player> computers, bool doesOwe) {
     if (this->cash - amount < 0) {
-        functions::printlnRed("It seems that you don't have enough money to buy this.");
-        return false;
+        if (this->isMainPlayer) {
+            functions::printlnRed("It seems that you don't have enough money to buy this.");
+            canMakeMoney:
+            if (this->moneyCanMake() < amount) {
+                functions::printlnRed("You can't fathom gathering this money.");
+                checkCanSellCards:
+                if (this->getOutOfJailFreeCards > 0) {
+                    functions::printlnGreen("However there is still hope. You have " + std::to_string(this->getOutOfJailFreeCards) + " get out of jail free cards.");
+                    functions::printlnBlue("You can attempt to trade them to one of the computers for some cash.");
+                    functions::printlnBlue("You need to raise $" + std::to_string(this->cash - this->moneyCanMake()));
+                    int amountToSell = functions::readIntInput("Enter an amount to sell your card(s): >", this->cash - this->moneyCanMake(), std::numeric_limits<int>::max());
+                    for (player::Player p : computers) {
+                        int pity = rand() % (10) + 1;
+                        if ((amountToSell > 50 * this->getOutOfJailFreeCards || pity <= 7) && p.cash >= amountToSell) {
+                            functions::printlnRed(p.name + " doesn't want to buy them.");
+                        } else {
+                            functions::printlnBlue(p.name + " wants to buy them.");
+                            p.getOutOfJailFreeCards += this->getOutOfJailFreeCards;
+                            this->getOutOfJailFreeCards = 0;
+                            p.cash -= amountToSell;
+                            this->cash += amountToSell;
+                            goto canMakeMoney;
+                        }
+                    }
+                    goto checkCanSellCards;
+                } else {
+                    functions::printlnBlue("You couldn't muster up the money!");
+                    if (doesOwe) {
+                        functions::printlnRed("You give all your properties to the person you owed");
+                    } else {
+                        functions::printlnRed("You give all your properties and money to the bank.");
+                        functions::printlnRed("The properties are all auctioned off.");
+                    }
+                    functions::printlnRed("YOU LOSE");
+                    functions::readStringInput("PRESS ENTER TO EXIT");
+                    exit(0);
+                }
+            } else {
+                functions::printlnBlue("You do the math and you can make the money you need. You just need to sell some stuff");
+                functions::printlnCyan("You can either sell any houses you have at half price or mortgage properties.");
+                functions::printlnMagenta("You need to sell houses evenly across the color set.");
+                functions::printlnYellow("If you sell a hotel, you get half the value back and 4 houses get placed on that square");
+                functions::printlnRed("To mortgage a property, you first need to sell all hotels and houses on it. To unmortage a property, you must pay the amount listed on the title card.");
+                functions::printlnGreen("If someone lands on a unmortaged property, they don't have to pay rent.");
+            }
+        } else {
+
+        }
     }
-    return true;
+}
+
+int player::Player::moneyCanMake() {
+    int cashAvailable = this->cash;
+    for (plot::Plot p : this->ownedPlots) {
+        cashAvailable += (p.intProperties.at("HOTELSCOST") / 2) * p.intProperties.at("HOTELS");
+        cashAvailable += (p.intProperties.at("HOUSESCOST") / 2) * p.intProperties.at("HOUSES");
+        cashAvailable += p.intProperties.at("UNMORTGAGEVALUE");
+    }
+    return cashAvailable;
 }
 
 #endif
