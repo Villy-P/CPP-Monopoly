@@ -50,38 +50,6 @@ void player::Player::movePlayer(board::Board& board, player::Player mainPlayer, 
         }
     }
     std::cout << this->name << " landed on " << nextSquareColor << nextSquareName << functions::ANSI_RESET << std::endl;
-    // if (board.getPlot(this->plotPosition + squaresToMove).flags.count("PROPERTYSQUARE")) {
-    //     if (!functions::setContains(board.getPlot(this->plotPosition + squaresToMove).flags, "OWNEDPLOT")) {
-    //         int rentCost = board.getPlot(this->plotPosition + squaresToMove).intProperties.at("PRICE");
-    //         cout << nextSquareColor << nextSquareName << " costs $" << rentCost << endl;
-    //         if (this->isMainPlayer) {
-    //             functions::printlnRed("You have $" + this->cash);
-    //             functions::printlnBlue("1: Buy it");
-    //             functions::printlnGreen("2: Auction it off");
-    //             int input = functions::readIntInput(">", 1, 2);
-    //             if (input == 1) {
-    //                 if (this->reduceMoney(rentCost)) {
-    //                     cout << "You bought " << nextSquareName << " and got a title card:" << endl;
-    //                     this->buyProperty(board, squaresToMove);
-    //                 } else {
-    //                     // board.getPlot(this->plotPosition + squaresToMove).auction();
-    //                 }
-    //             } else {
-
-    //             }
-    //         } else {
-    //             float randomValue = (float) rand() / (float) RAND_MAX;
-    //             if (this->reduceMoney(rentCost) && randomValue > .35) {
-    //                 cout << this->name << "decided to buy " + nextSquareColor << nextSquareName << functions::ANSI_RESET << endl;
-    //                 this->buyProperty(board, squaresToMove);
-    //             } else {
-
-    //             }
-    //         }
-    //     } else {
-
-    //     }
-    // }
     functions::readStringInput("");
     this->plotPosition += squaresToMove;
     this->plotPosition = this->plotPosition >= (board.plots.size()) ? this->plotPosition - board.plots.size() : this->plotPosition;
@@ -190,9 +158,8 @@ void player::Player::reduceMoney(int amount, board::Board& board, player::Player
                 }
             }
         } else {
+            checkIfCanAfford:
             if (this->moneyCanMake() < amount) {
-
-            } else {
                 if (this->getOutOfJailFreeCards > 0) {
                     functions::printlnBlue(this->name + " needs money, so he offers to sell you " + std::to_string(this->getOutOfJailFreeCards) + " get out of jail free cards.");
                     functions::printlnBlue("He will sell them to you for $" + std::to_string(this->cash - this->moneyCanMake()));
@@ -204,6 +171,7 @@ void player::Player::reduceMoney(int amount, board::Board& board, player::Player
                         mainPlayer.cash -= this->cash - this->moneyCanMake();
                         mainPlayer.getOutOfJailFreeCards += this->getOutOfJailFreeCards;
                         this->getOutOfJailFreeCards = 0;
+                        goto checkIfCanAfford;
                     } else {
                         bankrupt:
                         functions::printlnCyan(this->name + " has gone bankrupt.");
@@ -219,6 +187,36 @@ void player::Player::reduceMoney(int amount, board::Board& board, player::Player
                 } else {
                     goto bankrupt;
                 }
+            } else {
+                forloop:
+                for (int i = 0; i < this->ownedPlots.size(); i++) {
+                    if (this->cash >= amount) {
+                        this->cash -= amount;
+                        return;
+                    }
+                    plot::Plot pickedPlot = this->ownedPlots[i];
+                    if (functions::setContains(pickedPlot.flags, "MORTGAGED"))
+                        continue;
+                    if (pickedPlot.intProperties.at("HOTELS") > 0) {
+                        this->cash += pickedPlot.intProperties.at("HOTELSCOST") / 2;
+                        pickedPlot.intProperties.at("HOTELS") = 0;
+                        pickedPlot.intProperties.at("HOUSES") = 4;
+                    } else if (pickedPlot.intProperties.at("HOUSES") > 0) {
+                        for (plot::Plot p : board.plots) {
+                            if (functions::setContains(p.flags, "PROPERTYSQUARE") && p.stringProperties.at("COLORCODE") == pickedPlot.stringProperties.at("COLORCODE")) {
+                                if (p.intProperties.at("HOUSES") < pickedPlot.intProperties.at("HOUSES") - 1) {
+                                    continue;
+                                }
+                            }
+                        }
+                        pickedPlot.intProperties.at("HOUSES") -= 1;
+                        this->cash += pickedPlot.intProperties.at("HOUSESCOST") / 2;
+                    } else {
+                        pickedPlot.flags.insert("MORTGAGED");
+                        this->cash += pickedPlot.intProperties.at("MORTGAGEVALUE");
+                    }
+                }
+                goto forloop;
             }
         }
     } else {
