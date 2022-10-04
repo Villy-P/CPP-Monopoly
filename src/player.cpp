@@ -52,36 +52,17 @@ void player::Player::movePlayer(board::Board& board, player::Player mainPlayer, 
     }
     std::cout << this->name << " landed on " << nextSquareColor << nextSquareName << functions::ANSI_RESET << std::endl;
     if (functions::setContains(nextPlot.flags, "PROPERTYSQUARE") || functions::setContains(nextPlot.flags, "RAILROAD") || functions::setContains(nextPlot.flags, "UTILITYSQUARE")) {
-        if (!functions::setContains(nextPlot.flags, "OWNEDPLOT")) {
-            if (this->isMainPlayer) {
-                std::cout << nextSquareColor << nextSquareName << functions::ANSI_RESET << " is unowned." << std::endl;
-                if (this->cash < nextPlot.intProperties.at("PRICE")) {
-                    functions::printlnRed("You don't have enough money to buy this!");
-                    functions::printlnRed("It will be auctioned");
-                    nextPlot.auction(board, mainPlayer, computers);
-                } else {
-                    functions::printlnBlue("Do you want to buy it? It costs $" + std::to_string(nextPlot.intProperties.at("PRICE")) + " and you have $" + std::to_string(this->cash));
-                }
-            } else {
-
-            }
-        } else if (functions::setContains(nextPlot.flags, "OWNEDPLOT") && !functions::setContains(nextPlot.flags, "MORTGAGED")) {
+        if (!functions::setContains(nextPlot.flags, "OWNEDPLOT"))
+            this->buyPropertySegment(nextPlot, board, mainPlayer, computers);
+        else if (functions::setContains(nextPlot.flags, "OWNEDPLOT") && !functions::setContains(nextPlot.flags, "MORTGAGED"))
             this->payRent(nextPlot, board, mainPlayer, computers, dieRoll);
-        } else {
-
-        }
+        else
+            functions::printlnBlue("Someone owns " + nextPlot.stringProperties.at("COLORCODE") + nextPlot.stringProperties.at("NAME") + functions::ANSI_RESET + " but it is morgaged so nothing happens");
     }
     functions::readStringInput("");
     this->plotPosition += squaresToMove;
     this->plotPosition = this->plotPosition >= (board.plots.size()) ? this->plotPosition - board.plots.size() : this->plotPosition;
     this->movePlayer(board, mainPlayer, computers);
-}
-
-void player::Player::buyProperty(board::Board& board, unsigned char squaresToMove) {
-    board.getPlot(this->plotPosition + squaresToMove).displayTitleCard();
-    board.getPlot(this->plotPosition + squaresToMove).flags.insert("OWNEDPLOT");
-    this->ownedPlots.push_back(board.getPlot(this->plotPosition + squaresToMove));
-    functions::readStringInput("");
 }
 
 void player::Player::reduceMoney(int amount, board::Board& board, player::Player mainPlayer, std::vector<player::Player> computers, bool doesOwe, player::Player oweTo) {
@@ -296,13 +277,15 @@ void player::Player::payRent(plot::Plot nextPlot, board::Board& board, player::P
         if (p.ownsPlot(nextPlot))
             whoOwns = p;
     functions::printlnRed(whoOwns.name + " owns " + nextPlot.stringProperties.at("COLORCODE") + nextPlot.stringProperties.at("NAME") + functions::ANSI_RESET);
-    if (functions::setContains(nextPlot.flags, "PROPERTYSQUARE"))
-        this->payRentOnProperty(nextPlot, board, mainPlayer, computers, whoOwns);
-    else if (functions::setContains(nextPlot.flags, "RAILROAD"))
-        this->payRentOnRailroad(nextPlot, board, mainPlayer, computers, whoOwns);
-    else
-        this->payRentOnUtility(nextPlot, board, mainPlayer, computers, whoOwns, dieRoll);
-    functions::printlnRed(this->name + " payed " + whoOwns.name + " $" + std::to_string(this->cash - previousMoney));
+    if (!std::count(this->ownedPlots.begin(), this->ownedPlots.end(), nextPlot)) {
+        if (functions::setContains(nextPlot.flags, "PROPERTYSQUARE"))
+            this->payRentOnProperty(nextPlot, board, mainPlayer, computers, whoOwns);
+        else if (functions::setContains(nextPlot.flags, "RAILROAD"))
+            this->payRentOnRailroad(nextPlot, board, mainPlayer, computers, whoOwns);
+        else
+            this->payRentOnUtility(nextPlot, board, mainPlayer, computers, whoOwns, dieRoll);
+        functions::printlnRed(this->name + " payed " + whoOwns.name + " $" + std::to_string(this->cash - previousMoney));
+    }
 }
 
 void player::Player::payRentOnProperty(plot::Plot nextPlot, board::Board& board, player::Player mainPlayer, std::vector<player::Player> computers, player::Player whoOwns) {
@@ -361,6 +344,49 @@ void player::Player::payRentOnUtility(plot::Plot nextPlot, board::Board& board, 
         this->reduceMoney((dieRoll[0] + dieRoll[1]) * 10, board, mainPlayer, computers, true, whoOwns);
         whoOwns.cash += (dieRoll[0] + dieRoll[1]) * 10;
     }
+}
+
+void player::Player::buyProperty(plot::Plot nextPlot, board::Board& board, player::Player mainPlayer, std::vector<player::Player> computers) {
+    this->ownedPlots.push_back(nextPlot);
+    nextPlot.flags.insert("OWNEDPLOT");
+    this->cash -= nextPlot.intProperties.at("PRICE");
+    functions::readStringInput("");
+}
+
+void player::Player::buyPropertyAsMainPlayer(plot::Plot nextPlot, board::Board& board, player::Player mainPlayer, std::vector<player::Player> computers) {
+    std::cout << nextPlot.stringProperties.at("COLORCODE") << nextPlot.stringProperties.at("NAME") << functions::ANSI_RESET << " is unowned." << std::endl;
+    if (this->cash < nextPlot.intProperties.at("PRICE")) {
+        functions::printlnRed("You don't have enough money to buy this!");
+        functions::printlnRed("It will be auctioned");
+        nextPlot.auction(board, mainPlayer, computers);
+    } else {
+        functions::printlnBlue("Do you want to buy it? It costs $" + std::to_string(nextPlot.intProperties.at("PRICE")) + " and you have $" + std::to_string(this->cash));
+        functions::printlnGreen("Enter 1 to buy it or 2 to auction it.");
+        int input = functions::readIntInput(">", 1, 2);
+        if (input == 1) {
+            std::cout << "You bought " << nextPlot.stringProperties.at("COLORCODE") << nextPlot.stringProperties.at("NAME") << functions::ANSI_RESET << std::endl;
+            this->buyProperty(nextPlot, board, mainPlayer, computers);
+        } else {
+            nextPlot.auction(board, mainPlayer, computers);
+        }
+    }
+}
+
+void player::Player::buyPropertyAsComputer(plot::Plot nextPlot, board::Board& board, player::Player mainPlayer, std::vector<player::Player> computers) {
+    if (this->cash >= nextPlot.intProperties.at("PRICE")) {
+        std::cout << this->name << " bought " << nextPlot.stringProperties.at("COLORCODE") << nextPlot.stringProperties.at("NAME") << functions::ANSI_RESET << std::endl;
+        this->buyProperty(nextPlot, board, mainPlayer, computers);
+    } else {
+        std::cout << this->name << " won't buy it, so it will be auctioned." << std::endl;
+        nextPlot.auction(board, mainPlayer, computers);
+    }
+}
+
+void player::Player::buyPropertySegment(plot::Plot nextPlot, board::Board& board, player::Player mainPlayer, std::vector<player::Player> computers) {
+    if (this->isMainPlayer)
+        this->buyPropertyAsMainPlayer(nextPlot, board, mainPlayer, computers);
+    else
+        this->buyPropertyAsComputer(nextPlot, board, mainPlayer, computers);
 }
 
 #endif

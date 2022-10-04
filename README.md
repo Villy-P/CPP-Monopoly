@@ -1,6 +1,6 @@
 # CPP-Monopoly
 
-## Sources:
+## Sources
 
 * Stack Overflow
 * Geeks for Geeks

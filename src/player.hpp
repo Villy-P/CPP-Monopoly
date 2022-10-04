@@ -24,7 +24,6 @@ namespace player {
             Player(bool isMainPlayer);
 
             void movePlayer(board::Board& board, Player mainPlayer, std::vector<Player> computers);
-            void buyProperty(board::Board& board, unsigned char squaresToMove);
             void reduceMoney(int amount, board::Board& board, Player mainPlayer, std::vector<player::Player> computers, bool doesOwe, Player oweTo);
             int moneyCanMake();
             bool ownsPlot(plot::Plot& plot);
@@ -36,6 +35,10 @@ namespace player {
             void payRentOnProperty(plot::Plot nextPlot, board::Board& board, player::Player mainPlayer, std::vector<player::Player> computers, player::Player whoOwns);
             void payRentOnRailroad(plot::Plot nextPlot, board::Board& board, player::Player mainPlayer, std::vector<player::Player> computers, player::Player whoOwns);
             void payRentOnUtility(plot::Plot nextPlot, board::Board& board, player::Player mainPlayer, std::vector<player::Player> computers, player::Player whoOwns, std::vector<unsigned char> dieRoll);
+            void buyProperty(plot::Plot nextPlot, board::Board& board, player::Player mainPlayer, std::vector<player::Player> computers);
+            void buyPropertyAsMainPlayer(plot::Plot nextPlot, board::Board& board, player::Player mainPlayer, std::vector<player::Player> computers);
+            void buyPropertyAsComputer(plot::Plot nextPlot, board::Board& board, player::Player mainPlayer, std::vector<player::Player> computers);
+            void buyPropertySegment(plot::Plot nextPlot, board::Board& board, player::Player mainPlayer, std::vector<player::Player> computers);
     };
 }
 
