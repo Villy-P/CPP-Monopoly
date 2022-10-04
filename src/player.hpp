@@ -2,6 +2,7 @@
 #define SRC_PLAYER_H_
 
 #include "board.hpp"
+#include "plot.hpp"
 
 #include <string>
 #include <vector>
@@ -16,6 +17,7 @@ namespace player {
             int plotPosition = 0;
             int bid = 0;
             bool isBidding = true;
+            bool inGame = true;
             std::vector<plot::Plot> ownedPlots;
             unsigned char getOutOfJailFreeCards = 0;
 
@@ -25,6 +27,8 @@ namespace player {
             void buyProperty(board::Board& board, unsigned char squaresToMove);
             void reduceMoney(int amount, board::Board& board, Player mainPlayer, std::vector<player::Player> computers, bool doesOwe, Player oweTo);
             int moneyCanMake();
+            bool ownsPlot(plot::Plot& plot);
+            void computerBankruptcy(board::Board& board, std::vector<Player> computers, Player mainPlayer, bool doesOwe, Player oweTo);
     };
 }
 

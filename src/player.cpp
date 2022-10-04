@@ -26,6 +26,7 @@ void player::Player::movePlayer(board::Board& board, player::Player mainPlayer, 
     std::string nextSquareColor = board.getStringProperty((this->plotPosition + squaresToMove), "COLORCODE");
     std::string nextSquareName = board.getStringProperty(this->plotPosition + squaresToMove, "NAME");
     std::string nextSquareText = board.getStringProperty(this->plotPosition + squaresToMove, "TEXT");
+    plot::Plot nextPlot = board.getPlot(this->plotPosition + squaresToMove);
     functions::printlnBlue(this->name + " rolled:");
     std::cout << "+---+ +---+" << std::endl;
     std::cout << "| " << std::to_string(dieRoll[0]) << " | | " << std::to_string(dieRoll[1]) << " |" << std::endl;
@@ -37,8 +38,8 @@ void player::Player::movePlayer(board::Board& board, player::Player mainPlayer, 
     std::cout << "| " << currentSquareName << "    " << currentSquareText << " |" << std::endl;
     std::cout << "+" << std::string(currentSquareName.length() + currentSquareText.length() + 6, '-') << "+" << functions::ANSI_RESET << std::endl;
     std::cout << "To" << std::endl;
-    std::cout << " " << functions::ANSI_GREEN << std::string(board.getPlot(this->plotPosition + squaresToMove).intProperties.at("HOUSES"), 'O') << functions::ANSI_RESET;
-    std::cout << " " << functions::ANSI_RED << std::string(board.getPlot(this->plotPosition + squaresToMove).intProperties.at("HOTELS"), 'O') << functions::ANSI_RESET << std::endl;
+    std::cout << " " << functions::ANSI_GREEN << std::string(nextPlot.intProperties.at("HOUSES"), 'O') << functions::ANSI_RESET;
+    std::cout << " " << functions::ANSI_RED << std::string(nextPlot.intProperties.at("HOTELS"), 'O') << functions::ANSI_RESET << std::endl;
     std::cout << nextSquareColor << "+" << std::string(nextSquareName.length() + nextSquareText.length() + 6, '-') << "+" << std::endl;
     std::cout << "| " << nextSquareName << "    " << nextSquareText << " |" << std::endl;
     std::cout << "+" << std::string(nextSquareName.length() + nextSquareText.length() + 6, '-') << "+" << functions::ANSI_RESET << std::endl;
@@ -50,6 +51,36 @@ void player::Player::movePlayer(board::Board& board, player::Player mainPlayer, 
         }
     }
     std::cout << this->name << " landed on " << nextSquareColor << nextSquareName << functions::ANSI_RESET << std::endl;
+    if (functions::setContains(nextPlot.flags, "PROPERTYSQUARE")) {
+        if (!functions::setContains(nextPlot.flags, "OWNEDPLOT")) {
+
+        } else if (functions::setContains(nextPlot.flags, "OWNEDPLOT") && !functions::setContains(nextPlot.flags, "MORTGAGED")) {
+            player::Player whoOwns(false);
+            if (mainPlayer.ownsPlot(nextPlot))
+                whoOwns = mainPlayer;
+            for (player::Player p : computers)
+                if (p.ownsPlot(nextPlot))
+                    whoOwns = p;
+            if (nextPlot.intProperties.at("HOTELS") == 1) {
+                this->reduceMoney(nextPlot.intProperties.at("RENTWITHHOTEL"), board, mainPlayer, computers, true, whoOwns);
+                whoOwns.cash += nextPlot.intProperties.at("RENTWITHHOTEL");
+            } else if (nextPlot.intProperties.at("HOUSES") == 4) {
+                this->reduceMoney(nextPlot.intProperties.at("RENTWITHFOURHOUSES"), board, mainPlayer, computers, true, whoOwns);
+                whoOwns.cash += nextPlot.intProperties.at("RENTWITHFOURHOUSES");
+            } else if (nextPlot.intProperties.at("HOUSES") == 3) {
+                this->reduceMoney(nextPlot.intProperties.at("RENTWITHTHREEHOUSES"), board, mainPlayer, computers, true, whoOwns);
+                whoOwns.cash += nextPlot.intProperties.at("RENTWITHTHREEHOUSES");
+            } else if (nextPlot.intProperties.at("HOUSES") == 2) {
+                this->reduceMoney(nextPlot.intProperties.at("RENTWITHTWOHOUSES"), board, mainPlayer, computers, true, whoOwns);
+                whoOwns.cash += nextPlot.intProperties.at("RENTWITHTWOHOUSES");
+            } else if (nextPlot.intProperties.at("HOUSES") == 1) {
+                this->reduceMoney(nextPlot.intProperties.at("RENTWITHONEHOUSE"), board, mainPlayer, computers, true, whoOwns);
+                whoOwns.cash += nextPlot.intProperties.at("RENTWITHONEHOUSE");
+            }
+        } else {
+
+        }
+    }
     functions::readStringInput("");
     this->plotPosition += squaresToMove;
     this->plotPosition = this->plotPosition >= (board.plots.size()) ? this->plotPosition - board.plots.size() : this->plotPosition;
@@ -173,19 +204,12 @@ void player::Player::reduceMoney(int amount, board::Board& board, player::Player
                         this->getOutOfJailFreeCards = 0;
                         goto checkIfCanAfford;
                     } else {
-                        bankrupt:
-                        functions::printlnCyan(this->name + " has gone bankrupt.");
-                        computers.erase(computers.begin() + (std::find(computers.begin(), computers.end(), this) - computers.begin()));
-                        if (doesOwe)
-                            for (plot::Plot p : this->ownedPlots)
-                                oweTo.ownedPlots.push_back(p);
-                        else
-                            for (plot::Plot p : this->ownedPlots)
-                                p.auction(board, mainPlayer, computers);
+                        this->computerBankruptcy(board, computers, mainPlayer, doesOwe, oweTo);
                         return;
                     }
                 } else {
-                    goto bankrupt;
+                    this->computerBankruptcy(board, computers, mainPlayer, doesOwe, oweTo);
+                    return;
                 }
             } else {
                 forloop:
@@ -232,6 +256,21 @@ int player::Player::moneyCanMake() {
         cashAvailable += p.intProperties.at("UNMORTGAGEVALUE");
     }
     return cashAvailable;
+}
+
+bool player::Player::ownsPlot(plot::Plot& plot) {
+    return plot.stringProperties.at("OWNER") == this->name;
+}
+
+void player::Player::computerBankruptcy(board::Board& board, std::vector<player::Player> computers, player::Player mainPlayer, bool doesOwe, player::Player oweTo) {
+    functions::printlnCyan(this->name + " has gone bankrupt.");
+    this->inGame = false;
+    if (doesOwe)
+        for (plot::Plot p : this->ownedPlots)
+            oweTo.ownedPlots.push_back(p);
+    else
+        for (plot::Plot p : this->ownedPlots)
+            p.auction(board, mainPlayer, computers);
 }
 
 #endif
