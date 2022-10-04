@@ -29,6 +29,13 @@ namespace player {
             int moneyCanMake();
             bool ownsPlot(plot::Plot& plot);
             void computerBankruptcy(board::Board& board, std::vector<Player> computers, Player mainPlayer, bool doesOwe, Player oweTo);
+            bool ownsColorSet(std::string color);
+            unsigned char ownedRailroads();
+            unsigned char ownedUtilities();
+            void payRent(plot::Plot nextPlot, board::Board& board, player::Player mainPlayer, std::vector<player::Player> computers, std::vector<unsigned char> dieRoll);
+            void payRentOnProperty(plot::Plot nextPlot, board::Board& board, player::Player mainPlayer, std::vector<player::Player> computers, player::Player whoOwns);
+            void payRentOnRailroad(plot::Plot nextPlot, board::Board& board, player::Player mainPlayer, std::vector<player::Player> computers, player::Player whoOwns);
+            void payRentOnUtility(plot::Plot nextPlot, board::Board& board, player::Player mainPlayer, std::vector<player::Player> computers, player::Player whoOwns, std::vector<unsigned char> dieRoll);
     };
 }
 

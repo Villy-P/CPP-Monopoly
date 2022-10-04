@@ -51,32 +51,22 @@ void player::Player::movePlayer(board::Board& board, player::Player mainPlayer, 
         }
     }
     std::cout << this->name << " landed on " << nextSquareColor << nextSquareName << functions::ANSI_RESET << std::endl;
-    if (functions::setContains(nextPlot.flags, "PROPERTYSQUARE")) {
+    if (functions::setContains(nextPlot.flags, "PROPERTYSQUARE") || functions::setContains(nextPlot.flags, "RAILROAD") || functions::setContains(nextPlot.flags, "UTILITYSQUARE")) {
         if (!functions::setContains(nextPlot.flags, "OWNEDPLOT")) {
+            if (this->isMainPlayer) {
+                std::cout << nextSquareColor << nextSquareName << functions::ANSI_RESET << " is unowned." << std::endl;
+                if (this->cash < nextPlot.intProperties.at("PRICE")) {
+                    functions::printlnRed("You don't have enough money to buy this!");
+                    functions::printlnRed("It will be auctioned");
+                    nextPlot.auction(board, mainPlayer, computers);
+                } else {
+                    functions::printlnBlue("Do you want to buy it? It costs $" + std::to_string(nextPlot.intProperties.at("PRICE")) + " and you have $" + std::to_string(this->cash));
+                }
+            } else {
 
-        } else if (functions::setContains(nextPlot.flags, "OWNEDPLOT") && !functions::setContains(nextPlot.flags, "MORTGAGED")) {
-            player::Player whoOwns(false);
-            if (mainPlayer.ownsPlot(nextPlot))
-                whoOwns = mainPlayer;
-            for (player::Player p : computers)
-                if (p.ownsPlot(nextPlot))
-                    whoOwns = p;
-            if (nextPlot.intProperties.at("HOTELS") == 1) {
-                this->reduceMoney(nextPlot.intProperties.at("RENTWITHHOTEL"), board, mainPlayer, computers, true, whoOwns);
-                whoOwns.cash += nextPlot.intProperties.at("RENTWITHHOTEL");
-            } else if (nextPlot.intProperties.at("HOUSES") == 4) {
-                this->reduceMoney(nextPlot.intProperties.at("RENTWITHFOURHOUSES"), board, mainPlayer, computers, true, whoOwns);
-                whoOwns.cash += nextPlot.intProperties.at("RENTWITHFOURHOUSES");
-            } else if (nextPlot.intProperties.at("HOUSES") == 3) {
-                this->reduceMoney(nextPlot.intProperties.at("RENTWITHTHREEHOUSES"), board, mainPlayer, computers, true, whoOwns);
-                whoOwns.cash += nextPlot.intProperties.at("RENTWITHTHREEHOUSES");
-            } else if (nextPlot.intProperties.at("HOUSES") == 2) {
-                this->reduceMoney(nextPlot.intProperties.at("RENTWITHTWOHOUSES"), board, mainPlayer, computers, true, whoOwns);
-                whoOwns.cash += nextPlot.intProperties.at("RENTWITHTWOHOUSES");
-            } else if (nextPlot.intProperties.at("HOUSES") == 1) {
-                this->reduceMoney(nextPlot.intProperties.at("RENTWITHONEHOUSE"), board, mainPlayer, computers, true, whoOwns);
-                whoOwns.cash += nextPlot.intProperties.at("RENTWITHONEHOUSE");
             }
+        } else if (functions::setContains(nextPlot.flags, "OWNEDPLOT") && !functions::setContains(nextPlot.flags, "MORTGAGED")) {
+            this->payRent(nextPlot, board, mainPlayer, computers, dieRoll);
         } else {
 
         }
@@ -271,6 +261,106 @@ void player::Player::computerBankruptcy(board::Board& board, std::vector<player:
     else
         for (plot::Plot p : this->ownedPlots)
             p.auction(board, mainPlayer, computers);
+}
+
+bool player::Player::ownsColorSet(std::string color) {
+    unsigned char matching = 0;
+    for (plot::Plot p : this->ownedPlots)
+        if (p.stringProperties.at("COLORCODE") == color && !functions::setContains(p.flags, "PROPERTYSQUARE"))
+            matching++;
+    return color == "BROWN" || color == "BLUE" ? matching == 2 : matching == 3;
+}
+
+unsigned char player::Player::ownedRailroads() {
+    unsigned char result = 0;
+    for (plot::Plot p : this->ownedPlots)
+        if (functions::setContains(p.flags, "RAILROAD"))
+            result++;
+    return result;
+}
+
+unsigned char player::Player::ownedUtilities() {
+    unsigned char result = 0;
+    for (plot::Plot p : this->ownedPlots)
+        if (functions::setContains(p.flags, "UTILITYSQUARE"))
+            result++;
+    return result;
+}
+
+void player::Player::payRent(plot::Plot nextPlot, board::Board& board, player::Player mainPlayer, std::vector<player::Player> computers, std::vector<unsigned char> dieRoll) {
+    player::Player whoOwns(false);
+    int previousMoney = this->cash;
+    if (mainPlayer.ownsPlot(nextPlot))
+        whoOwns = mainPlayer;
+    for (player::Player p : computers)
+        if (p.ownsPlot(nextPlot))
+            whoOwns = p;
+    functions::printlnRed(whoOwns.name + " owns " + nextPlot.stringProperties.at("COLORCODE") + nextPlot.stringProperties.at("NAME") + functions::ANSI_RESET);
+    if (functions::setContains(nextPlot.flags, "PROPERTYSQUARE"))
+        this->payRentOnProperty(nextPlot, board, mainPlayer, computers, whoOwns);
+    else if (functions::setContains(nextPlot.flags, "RAILROAD"))
+        this->payRentOnRailroad(nextPlot, board, mainPlayer, computers, whoOwns);
+    else
+        this->payRentOnUtility(nextPlot, board, mainPlayer, computers, whoOwns, dieRoll);
+    functions::printlnRed(this->name + " payed " + whoOwns.name + " $" + std::to_string(this->cash - previousMoney));
+}
+
+void player::Player::payRentOnProperty(plot::Plot nextPlot, board::Board& board, player::Player mainPlayer, std::vector<player::Player> computers, player::Player whoOwns) {
+    if (nextPlot.intProperties.at("HOTELS") == 1) {
+        this->reduceMoney(nextPlot.intProperties.at("RENTWITHHOTEL"), board, mainPlayer, computers, true, whoOwns);
+        whoOwns.cash += nextPlot.intProperties.at("RENTWITHHOTEL");
+    } else if (nextPlot.intProperties.at("HOUSES") == 4) {
+        this->reduceMoney(nextPlot.intProperties.at("RENTWITHFOURHOUSES"), board, mainPlayer, computers, true, whoOwns);
+        whoOwns.cash += nextPlot.intProperties.at("RENTWITHFOURHOUSES");
+    } else if (nextPlot.intProperties.at("HOUSES") == 3) {
+        this->reduceMoney(nextPlot.intProperties.at("RENTWITHTHREEHOUSES"), board, mainPlayer, computers, true, whoOwns);
+        whoOwns.cash += nextPlot.intProperties.at("RENTWITHTHREEHOUSES");
+    } else if (nextPlot.intProperties.at("HOUSES") == 2) {
+        this->reduceMoney(nextPlot.intProperties.at("RENTWITHTWOHOUSES"), board, mainPlayer, computers, true, whoOwns);
+        whoOwns.cash += nextPlot.intProperties.at("RENTWITHTWOHOUSES");
+    } else if (nextPlot.intProperties.at("HOUSES") == 1) {
+        this->reduceMoney(nextPlot.intProperties.at("RENTWITHONEHOUSE"), board, mainPlayer, computers, true, whoOwns);
+        whoOwns.cash += nextPlot.intProperties.at("RENTWITHONEHOUSE");
+    } else if (this->ownsColorSet(nextPlot.stringProperties.at("COLORCODE"))) {
+        this->reduceMoney(nextPlot.intProperties.at("RENTWITHCOLORSET"), board, mainPlayer, computers, true, whoOwns);
+        whoOwns.cash += nextPlot.intProperties.at("RENTWITHCOLORSET");
+    } else {
+        this->reduceMoney(nextPlot.intProperties.at("RENT"), board, mainPlayer, computers, true, whoOwns);
+        whoOwns.cash += nextPlot.intProperties.at("RENT");
+    }
+}
+
+void player::Player::payRentOnRailroad(plot::Plot nextPlot, board::Board& board, player::Player mainPlayer, std::vector<player::Player> computers, player::Player whoOwns) {
+    unsigned char ownedRailroads = this->ownedRailroads();
+    switch (ownedRailroads) {
+        case 1:
+            this->reduceMoney(nextPlot.intProperties.at("RENT"), board, mainPlayer, computers, true, whoOwns);
+            whoOwns.cash += nextPlot.intProperties.at("RENT");
+            break;
+        case 2:
+            this->reduceMoney(nextPlot.intProperties.at("RENT2RROWNED"), board, mainPlayer, computers, true, whoOwns);
+            whoOwns.cash += nextPlot.intProperties.at("RENT2RROWNED");
+            break;
+        case 3:
+            this->reduceMoney(nextPlot.intProperties.at("RENT3RROWNED"), board, mainPlayer, computers, true, whoOwns);
+            whoOwns.cash += nextPlot.intProperties.at("RENT3RROWNED");
+            break;
+        case 4:
+            this->reduceMoney(nextPlot.intProperties.at("RENT4RROWNED"), board, mainPlayer, computers, true, whoOwns);
+            whoOwns.cash += nextPlot.intProperties.at("RENT4RROWNED");
+            break;
+    }
+}
+
+void player::Player::payRentOnUtility(plot::Plot nextPlot, board::Board& board, player::Player mainPlayer, std::vector<player::Player> computers, player::Player whoOwns, std::vector<unsigned char> dieRoll) {
+    unsigned char ownedUtilities = this->ownedRailroads();
+    if (ownedUtilities == 1) {
+        this->reduceMoney((dieRoll[0] + dieRoll[1]) * 4, board, mainPlayer, computers, true, whoOwns);
+        whoOwns.cash += (dieRoll[0] + dieRoll[1]) * 4;
+    } else {
+        this->reduceMoney((dieRoll[0] + dieRoll[1]) * 10, board, mainPlayer, computers, true, whoOwns);
+        whoOwns.cash += (dieRoll[0] + dieRoll[1]) * 10;
+    }
 }
 
 #endif
