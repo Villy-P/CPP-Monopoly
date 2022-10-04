@@ -277,7 +277,7 @@ void player::Player::payRent(plot::Plot nextPlot, board::Board& board, player::P
         if (p.ownsPlot(nextPlot))
             whoOwns = p;
     functions::printlnRed(whoOwns.name + " owns " + nextPlot.stringProperties.at("COLORCODE") + nextPlot.stringProperties.at("NAME") + functions::ANSI_RESET);
-    if (!std::count(this->ownedPlots.begin(), this->ownedPlots.end(), nextPlot)) {
+    if (nextPlot.stringProperties.at("OWNER") != this->name) {
         if (functions::setContains(nextPlot.flags, "PROPERTYSQUARE"))
             this->payRentOnProperty(nextPlot, board, mainPlayer, computers, whoOwns);
         else if (functions::setContains(nextPlot.flags, "RAILROAD"))
