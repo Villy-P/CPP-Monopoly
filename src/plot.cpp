@@ -106,35 +106,7 @@ std::string plot::Plot::getRentWithHouseString(unsigned char number, std::string
 }
 
 void plot::Plot::auction(board::Board& board, player::Player player, std::vector<player::Player> computers) {
-    std::vector<player::Player> players;
-    players.push_back(player);
-    for (player::Player computer : computers)
-        players.push_back(computer);
     std::cout << "Bidding has started on the property " << this->stringProperties.at("COLORCODE") << this->stringProperties.at("NAME") << functions::ANSI_RESET << std::endl;
-    player::Player maxBidder(false);
-    while (true) {
-        std::cout << "The current bid is $" << std::to_string(maxBidder.bid) << std::endl;
-        if (this->playersStillBidding(players))
-            break;
-        for (player::Player user : players) {
-            if (!user.isBidding)
-                continue;
-            if (user.isMainPlayer) {
-                functions::printlnBlue("It's your turn to bid");
-                functions::printlnBlue("Your current bid is $" + std::to_string(user.bid));
-                int input = functions::readIntInput("Enter a number higher than the current bid minus your current bid (or 0 to stop bidding)>", 0, maxBidder.bid - user.bid);
-                if (input == 0) {
-                    functions::printlnRed("You have stopped bidding.");
-                    user.isBidding = false;
-                } else {
-                    user.bid += input;
-                    
-                }
-            } else {
-
-            }
-        }
-    }
 }
 
 bool plot::Plot::playersStillBidding(std::vector<player::Player> players) {
