@@ -40,11 +40,6 @@ void card_managment::CardManagment::createCards() {
             card.isChance ? this->chanceCards.push_back(card) : this->chestCards.push_back(card);
                 card = card::Card(true, "", {}, {});
         }
-    } else {
-        functions::printlnRed("FATAL ERROR. CANNOT FIND OR READ FILE NAMED PLOTDATA.TXT");
-        functions::printlnRed("PLEASE CHECK THAT THE FILE EXISTS WITHIN THE SAME DIRECTORY AS MAIN.EXE AND CHECK FILE PERMISSIONS");
-        functions::readStringInput("PRESS ENTER TO ABORT.");
-        exit(0);
     }
 }
 
@@ -87,7 +82,7 @@ void card_managment::CardManagment::drawChestCard() {
     std::cout << "+---------------------------------------------+" << std::endl;
     std::cout << "|                      +------+-+             |" << std::endl;
     std::cout << "|                     /      / /              |" << std::endl;
-    std::cout << "|                    .^__/\\_._.               |" << std::endl;
+    std::cout << "|                    .^__/\\_._.              |" << std::endl;
     std::cout << "|                  +--------+V+               |" << std::endl;
     std::cout << "|                  +________+.+               |" << std::endl;
     std::cout << "+---------------------------------------------+" << std::endl;
