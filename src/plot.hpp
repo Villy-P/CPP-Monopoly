@@ -26,8 +26,8 @@ namespace plot {
             void displayUtilityCard();
             void displayRailroadCard();
             std::string getRentWithHouseString(unsigned char number, std::string name, unsigned char titleCardLength);
-            void auction(board::Board& board, player::Player player, std::vector<player::Player> computers);
-            bool playersStillBidding(std::vector<player::Player> players);
+            void auction(board::Board& board, player::Player& player, std::vector<player::Player>& computers);
+            bool playersStillBidding(std::vector<player::Player>& players, player::Player& mainPlayer);
     };
 }
 

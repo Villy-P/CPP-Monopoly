@@ -75,5 +75,5 @@ int main(void) {
     }
     functions::printlnGreen(firstMover.name + " will be moving first!");
     functions::readStringInput("");
-    firstMover.movePlayer(board, player, computers);
+    firstMover.movePlayer(board, player, computers, cardManager);
 }
