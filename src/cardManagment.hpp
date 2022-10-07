@@ -13,8 +13,8 @@ namespace card_managment {
             std::deque<card::Card> chestCards;
 
             void shuffleDecks();
-            void drawChanceCard();
-            void drawChestCard();
+            void drawChanceCard(board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers, player::Player& player);
+            void drawChestCard(board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers, player::Player& player);
             void createCards();
 
             void redeemCard(board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers, player::Player& player, card::Card& card);

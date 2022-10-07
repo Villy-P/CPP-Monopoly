@@ -403,7 +403,7 @@ void player::Player::landOnSquare(plot::Plot& nextPlot, board::Board& board, pla
         this->reduceMoney(nextPlot.intProperties.at("TAXAMOUNT"), board, mainPlayer, computers, false, computers[0]);
     } else if (functions::setContains(nextPlot.flags, "COMMUNITYCHEST")) {
         functions::printlnGreen(this->name + " landed on a Community Chest square.");
-        cardManager.drawChestCard();
+        cardManager.drawChestCard(board, mainPlayer, computers, *this);
     }
 }
 

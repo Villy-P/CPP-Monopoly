@@ -43,12 +43,12 @@ void card_managment::CardManagment::createCards() {
     }
 }
 
-void card_managment::CardManagment::drawChanceCard() {
+void card_managment::CardManagment::drawChanceCard(board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers, player::Player& player) {
     card::Card card = this->chanceCards[0];
     if (functions::setContains(card.flags, "WITHPLAYER")) {
         this->chanceCards.pop_front();
         this->chanceCards.push_back(card);
-        this->drawChanceCard();
+        this->drawChanceCard(board, mainPlayer, computers, player);
     }
     std::vector<std::string> displaySentence = functions::split(card.description, ' ');
     unsigned char lengthOfEach = displaySentence.size() / 5;
@@ -76,15 +76,15 @@ void card_managment::CardManagment::drawChanceCard() {
     std::cout << "+----------------------------------------------+" << std::endl;
     this->chanceCards.pop_front();
     this->chanceCards.push_back(card);
-    std::cout << this->chanceCards.size() << std::endl;
+    this->redeemCard(board, mainPlayer, computers, player, card);
 }
 
-void card_managment::CardManagment::drawChestCard() {
+void card_managment::CardManagment::drawChestCard(board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers, player::Player& player) {
     card::Card card = this->chestCards[0];
     if (functions::setContains(card.flags, "WITHPLAYER")) {
         this->chanceCards.pop_front();
         this->chanceCards.push_back(card);
-        this->drawChanceCard();
+        this->drawChanceCard(board, mainPlayer, computers, player);
     }
     std::vector<std::string> displaySentence = functions::split(card.description, ' ');
     unsigned char lengthOfEach = displaySentence.size() / 5;
@@ -92,7 +92,7 @@ void card_managment::CardManagment::drawChestCard() {
     std::cout << "+---------------------------------------------+" << std::endl;
     std::cout << "|                      +------+-+             |" << std::endl;
     std::cout << "|                     /      / /              |" << std::endl;
-    std::cout << "|                    .^__/\\_._.              |" << std::endl;
+    std::cout << "|                    .^__/\\_._.               |" << std::endl;
     std::cout << "|                  +--------+V+               |" << std::endl;
     std::cout << "|                  +________+.+               |" << std::endl;
     std::cout << "+---------------------------------------------+" << std::endl;
@@ -112,7 +112,7 @@ void card_managment::CardManagment::drawChestCard() {
     std::cout << "+----------------------------------------------+" << std::endl;
     this->chestCards.pop_front();
     this->chestCards.push_back(card);
-    std::cout << this->chestCards.size() << std::endl;
+    this->redeemCard(board, mainPlayer, computers, player, card);
 }
 
 void card_managment::CardManagment::redeemCard(board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers, player::Player& player, card::Card& card) {
