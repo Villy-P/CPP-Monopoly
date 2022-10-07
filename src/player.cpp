@@ -347,6 +347,12 @@ void player::Player::payRentOnUtility(plot::Plot& nextPlot, board::Board& board,
 }
 
 void player::Player::buyProperty(plot::Plot& nextPlot, board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers) {
+    if (functions::setContains(nextPlot.flags, "PROPERTYSQUARE"))
+        nextPlot.displayTitleCard();
+    else if (functions::setContains(nextPlot.flags, "RAILROAD"))
+        nextPlot.displayRailroadCard();
+    else
+        nextPlot.displayUtilityCard();
     this->ownedPlots.push_back(nextPlot);
     nextPlot.flags.insert("OWNEDPLOT");
     this->cash -= nextPlot.intProperties.at("PRICE");
@@ -365,7 +371,7 @@ void player::Player::buyPropertyAsMainPlayer(plot::Plot& nextPlot, board::Board&
         functions::printlnGreen("Enter 1 to buy it or 2 to auction it.");
         int input = functions::readIntInput(">", 1, 2);
         if (input == 1) {
-            std::cout << "You bought " << nextPlot.stringProperties.at("COLORCODE") << nextPlot.stringProperties.at("NAME") << functions::ANSI_RESET << std::endl;
+            std::cout << "You bought " << nextPlot.stringProperties.at("COLORCODE") << nextPlot.stringProperties.at("NAME") << functions::ANSI_RESET << " and got a title card:" << std::endl;
             this->buyProperty(nextPlot, board, mainPlayer, computers);
         } else {
             nextPlot.auction(board, mainPlayer, computers);
@@ -375,7 +381,7 @@ void player::Player::buyPropertyAsMainPlayer(plot::Plot& nextPlot, board::Board&
 
 void player::Player::buyPropertyAsComputer(plot::Plot& nextPlot, board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers) {
     if (this->cash >= nextPlot.intProperties.at("PRICE")) {
-        std::cout << this->name << " bought " << nextPlot.stringProperties.at("COLORCODE") << nextPlot.stringProperties.at("NAME") << functions::ANSI_RESET << std::endl;
+        std::cout << this->name << " bought " << nextPlot.stringProperties.at("COLORCODE") << nextPlot.stringProperties.at("NAME") << functions::ANSI_RESET << " and got a title card:" << std::endl;
         this->buyProperty(nextPlot, board, mainPlayer, computers);
     } else {
         std::cout << this->name << " won't buy it, so it will be auctioned." << std::endl;
