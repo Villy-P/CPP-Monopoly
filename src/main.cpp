@@ -65,15 +65,26 @@ int main(void) {
     }
     std::vector<unsigned char> playerDice = board.rollDice();
     unsigned char firstMoverCount = playerDice[0] + playerDice[1];
-    player::Player firstMover = player;
+    player::Player* mover = &player;
+    unsigned char moverIndex = 0;
     for (unsigned char i = 0; i < computerNumber; i++) {
         std::vector<unsigned char> dice = board.rollDice();
         if (dice[0] + dice[1] > firstMoverCount) {
             firstMoverCount = dice[0] + dice[1];
-            firstMover = computers[i];
+            mover = &computers[i];
         }
     }
-    functions::printlnGreen(firstMover.name + " will be moving first!");
+    functions::printlnGreen(mover->name + " will be moving first!");
     functions::readStringInput("");
-    firstMover.movePlayer(board, player, computers, cardManager);
+    while (true) {
+        mover->movePlayer(board, player, computers, cardManager);
+        if (mover->isMainPlayer)
+            mover = &computers[moverIndex];
+        else if (mover->name == "Computer #" + std::to_string(computers.size() - 1)) {
+            mover = &player;
+            moverIndex = 0;
+        }
+        else
+            mover = &computers[++moverIndex];
+    }
 }

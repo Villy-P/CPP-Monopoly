@@ -20,12 +20,12 @@ void player::Player::movePlayer(board::Board& board, player::Player& mainPlayer,
     functions::clear();
     std::vector<unsigned char> dieRoll = board.rollDice();
     int squaresToMove = dieRoll[0] + dieRoll[1];
-    std::string currentSquareColor =  board.getStringProperty(this->plotPosition, "COLORCODE");
-    std::string currentSquareName = board.getStringProperty(this->plotPosition, "NAME");
-    std::string currentSquareText = board.getStringProperty(this->plotPosition, "TEXT");
-    std::string nextSquareColor = board.getStringProperty((this->plotPosition + squaresToMove), "COLORCODE");
-    std::string nextSquareName = board.getStringProperty(this->plotPosition + squaresToMove, "NAME");
-    std::string nextSquareText = board.getStringProperty(this->plotPosition + squaresToMove, "TEXT");
+    std::string currentSquareColor = board.getPlot(this->plotPosition).stringProperties.at("COLORCODE");
+    std::string currentSquareName = board.getPlot(this->plotPosition).stringProperties.at("NAME");
+    std::string currentSquareText = board.getPlot(this->plotPosition).stringProperties.at("TEXT");
+    std::string nextSquareColor = board.getPlot(this->plotPosition + squaresToMove).stringProperties.at("COLORCODE");
+    std::string nextSquareName = board.getPlot(this->plotPosition + squaresToMove).stringProperties.at("NAME");
+    std::string nextSquareText = board.getPlot(this->plotPosition + squaresToMove).stringProperties.at("TEXT");
     plot::Plot nextPlot = board.getPlot(this->plotPosition + squaresToMove);
     functions::printlnBlue(this->name + " rolled:");
     std::cout << "+---+ +---+" << std::endl;
@@ -51,10 +51,11 @@ void player::Player::movePlayer(board::Board& board, player::Player& mainPlayer,
         }
     }
     this->landOnSquare(nextPlot, board, mainPlayer, computers, cardManager, dieRoll);
+    if (this->plotPosition + squaresToMove < board.plots.size())
+        this->plotPosition += squaresToMove;
+    else
+        this->plotPosition = this->plotPosition + squaresToMove - board.plots.size();
     functions::readStringInput("");
-    this->plotPosition += squaresToMove;
-    this->plotPosition = this->plotPosition >= (board.plots.size()) ? this->plotPosition - board.plots.size() : this->plotPosition;
-    this->movePlayer(board, mainPlayer, computers, cardManager);
 }
 
 void player::Player::reduceMoney(int amount, board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers, bool doesOwe, player::Player& oweTo) {
@@ -215,7 +216,7 @@ void player::Player::reduceMoney(int amount, board::Board& board, player::Player
 
 int player::Player::moneyCanMake() {
     int cashAvailable = this->cash;
-    for (plot::Plot p : this->ownedPlots) {
+    for (plot::Plot& p : this->ownedPlots) {
         cashAvailable += (p.intProperties.at("HOTELSCOST") / 2) * p.intProperties.at("HOTELS");
         cashAvailable += (p.intProperties.at("HOUSESCOST") / 2) * p.intProperties.at("HOUSES");
         cashAvailable += p.intProperties.at("UNMORTGAGEVALUE");
@@ -404,6 +405,13 @@ void player::Player::landOnSquare(plot::Plot& nextPlot, board::Board& board, pla
     } else if (functions::setContains(nextPlot.flags, "COMMUNITYCHEST")) {
         functions::printlnGreen(this->name + " landed on a Community Chest square.");
         cardManager.drawChestCard(board, mainPlayer, computers, *this);
+    } else if (functions::setContains(nextPlot.flags, "CHANCE")) {
+        functions::printlnGreen(this->name + " landed on a Chance square.");
+        cardManager.drawChestCard(board, mainPlayer, computers, *this);     
+    } else if (functions::setContains(nextPlot.flags, "GOTOJAIL")) {
+        functions::printlnRed(this->name + " is going to jail.");
+        this->plotPosition = 10;
+        this->inJail = true;
     }
 }
 

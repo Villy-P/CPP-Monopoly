@@ -109,7 +109,7 @@ std::string plot::Plot::getRentWithHouseString(unsigned char number, std::string
 void plot::Plot::auction(board::Board& board, player::Player& player, std::vector<player::Player>& computers) {
     player.bid = 0;
     player.isBidding = true;
-    for (player::Player c : computers) {
+    for (player::Player& c : computers) {
         c.bid = 0;
         c.isBidding = true;
     }
