@@ -16,7 +16,7 @@ namespace board {
             std::vector<unsigned char> rollDice();
             std::string getStringProperty(int index, std::string propertyName);
             int getIntProperty(int index, std::string propertyName);
-            plot::Plot getPlot(int index);
+            plot::Plot& getPlot(int index);
             void createPlots();
     };
 }

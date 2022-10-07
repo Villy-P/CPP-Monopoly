@@ -21,7 +21,7 @@ std::vector<unsigned char> board::Board::rollDice() {
     return vect;
 }
 
-plot::Plot board::Board::getPlot(int index) {
+plot::Plot& board::Board::getPlot(int index) {
     return this->plots[index >= (this->plots.size()) ? index - this->plots.size() : index];
 }
 

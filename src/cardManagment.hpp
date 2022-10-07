@@ -4,6 +4,7 @@
 #include <deque>
 
 #include "card.hpp"
+#include "board.hpp"
 
 namespace card_managment {
     class CardManagment {
