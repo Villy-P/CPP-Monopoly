@@ -36,7 +36,7 @@ namespace player {
             void payRent(plot::Plot& nextPlot, board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers, std::vector<unsigned char>& dieRoll);
             void payRentOnProperty(plot::Plot& nextPlot, board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers, player::Player& whoOwns);
             void payRentOnRailroad(plot::Plot& nextPlot, board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers, player::Player& whoOwns, bool payTwice);
-            void payRentOnUtility(plot::Plot& nextPlot, board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers, player::Player& whoOwns, std::vector<unsigned char> dieRoll);
+            void payRentOnUtility(plot::Plot& nextPlot, board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers, player::Player& whoOwns, std::vector<unsigned char> dieRoll, unsigned char timesAmount);
             void buyProperty(plot::Plot& nextPlot, board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers);
             void buyPropertyAsMainPlayer(plot::Plot& nextPlot, board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers);
             void buyPropertyAsComputer(plot::Plot& nextPlot, board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers);

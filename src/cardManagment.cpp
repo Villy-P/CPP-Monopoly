@@ -142,8 +142,10 @@ void card_managment::CardManagment::redeemCard(board::Board& board, player::Play
         for (player::Player p : computers)
             if (p.ownsPlot(board.getPlot(player.plotPosition)))
                 whoOwns = p;
-        if (functions::setContains(board.getPlot(player.plotPosition).flags, "OWNEDPLOT"))
+        if (functions::setContains(board.getPlot(player.plotPosition).flags, "OWNEDPLOT") && board.getPlot(player.plotPosition).stringProperties.at("OWNER") != player.name)
             player.payRentOnRailroad(board.getPlot(player.plotPosition), board, mainPlayer, computers, whoOwns, true);
+        else
+            player.buyPropertySegment(board.getPlot(player.plotPosition), board, mainPlayer, computers);
     } 
     if (functions::setContains(card.flags, "GOBACK")) {
         player.plotPosition -= std::stoi(card.properties.at("GOBACKAMOUNT"));
@@ -152,7 +154,7 @@ void card_managment::CardManagment::redeemCard(board::Board& board, player::Play
     if (functions::setContains(card.flags, "PAYEACH")) {
         if (player.isMainPlayer) {
             for (player::Player& p : computers) {
-                if (player.inGame) {
+                if (p.inGame) {
                     player.reduceMoney(std::stoi(card.properties.at("PAYEACHAMOUNT")), board, mainPlayer, computers, true, p);
                     p.cash += std::stoi(card.properties.at("PAYEACHAMOUNT"));
                 }
@@ -161,7 +163,7 @@ void card_managment::CardManagment::redeemCard(board::Board& board, player::Play
             player.reduceMoney(std::stoi(card.properties.at("PAYEACHAMOUNT")), board, mainPlayer, computers, true, mainPlayer);
             mainPlayer.cash += std::stoi(card.properties.at("PAYEACHAMOUNT"));
             for (player::Player& p : computers) {
-                if (player.inGame && p.name != player.name) {
+                if (p.inGame && p.name != player.name) {
                     player.reduceMoney(std::stoi(card.properties.at("PAYEACHAMOUNT")), board, mainPlayer, computers, true, p);
                     p.cash += std::stoi(card.properties.at("PAYEACHAMOUNT"));
                 }
@@ -193,6 +195,46 @@ void card_managment::CardManagment::redeemCard(board::Board& board, player::Play
         for (plot::Plot& p : player.ownedPlots)
             amount += std::stoi(card.properties.at("REPAIRHOTELSCOST")) * p.intProperties.at("HOTELS");
         player.reduceMoney(amount, board, mainPlayer, computers, false, player);
+    }
+    if (functions::setContains(card.flags, "ADVANCETONEARESTUTILITY")) {
+        if (player.plotPosition < 12 || player.plotPosition > 28) {
+            if (player.plotPosition < 40) {
+                std::cout << player.name << " passes by GO. +$200" << std::endl;
+                player.cash += 200;
+            }
+            player.plotPosition = 12;
+        } else {
+            player.plotPosition = 28;
+        }
+        player::Player whoOwns(false);
+        if (mainPlayer.ownsPlot(board.getPlot(player.plotPosition)))
+            whoOwns = mainPlayer;
+        for (player::Player p : computers)
+            if (p.ownsPlot(board.getPlot(player.plotPosition)))
+                whoOwns = p;
+        if (functions::setContains(board.getPlot(player.plotPosition).flags, "OWNEDPLOT") && board.getPlot(player.plotPosition).stringProperties.at("OWNER") != player.name)
+            player.payRentOnUtility(board.getPlot(player.plotPosition), board, mainPlayer, computers, whoOwns, board.rollDice(), 10);
+        else
+            player.buyPropertySegment(board.getPlot(player.plotPosition), board, mainPlayer, computers);
+    }
+    if (functions::setContains(card.flags, "COLLECTFROMEACH")) {
+        if (player.isMainPlayer) {
+            for (player::Player& p : computers) {
+                if (p.inGame) {
+                    p.reduceMoney(std::stoi(card.properties.at("COLLECTFROMEACHAMOUNT")), board, mainPlayer, computers, true, p);
+                    player.cash += std::stoi(card.properties.at("COLLECTFROMEACHAMOUNT"));
+                }
+            }
+        } else {
+            mainPlayer.reduceMoney(std::stoi(card.properties.at("COLLECTFROMEACHAMOUNT")), board, mainPlayer, computers, true, mainPlayer);
+            player.cash += std::stoi(card.properties.at("COLLECTFROMEACHAMOUNT"));
+            for (player::Player& p : computers) {
+                if (p.inGame && p.name != player.name) {
+                    p.reduceMoney(std::stoi(card.properties.at("COLLECTFROMEACHAMOUNT")), board, mainPlayer, computers, true, p);
+                    player.cash += std::stoi(card.properties.at("COLLECTFROMEACHAMOUNT"));
+                }
+            }
+        }
     }
 }
 

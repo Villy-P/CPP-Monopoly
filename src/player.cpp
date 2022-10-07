@@ -277,7 +277,7 @@ void player::Player::payRent(plot::Plot& nextPlot, board::Board& board, player::
         else if (functions::setContains(nextPlot.flags, "RAILROAD"))
             this->payRentOnRailroad(nextPlot, board, mainPlayer, computers, whoOwns, false);
         else
-            this->payRentOnUtility(nextPlot, board, mainPlayer, computers, whoOwns, dieRoll);
+            this->payRentOnUtility(nextPlot, board, mainPlayer, computers, whoOwns, dieRoll, 0);
         functions::printlnRed(this->name + " payed " + whoOwns.name + " $" + std::to_string(this->cash - previousMoney));
     }
 }
@@ -329,7 +329,12 @@ void player::Player::payRentOnRailroad(plot::Plot& nextPlot, board::Board& board
     }
 }
 
-void player::Player::payRentOnUtility(plot::Plot& nextPlot, board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers, player::Player& whoOwns, std::vector<unsigned char> dieRoll) {
+void player::Player::payRentOnUtility(plot::Plot& nextPlot, board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers, player::Player& whoOwns, std::vector<unsigned char> dieRoll, unsigned char timesAmount) {
+    if (timesAmount != 0) {
+        this->reduceMoney((dieRoll[0] + dieRoll[1]) * timesAmount, board, mainPlayer, computers, true, whoOwns);
+        whoOwns.cash += (dieRoll[0] + dieRoll[1]) * timesAmount;
+        return;
+    }
     unsigned char ownedUtilities = this->ownedRailroads();
     if (ownedUtilities == 1) {
         this->reduceMoney((dieRoll[0] + dieRoll[1]) * 4, board, mainPlayer, computers, true, whoOwns);
