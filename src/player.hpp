@@ -43,6 +43,7 @@ namespace player {
             void buyPropertyAsComputer(plot::Plot& nextPlot, board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers);
             void buyPropertySegment(plot::Plot& nextPlot, board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers);
             void landOnSquare(plot::Plot& nextPlot, board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers, card_managment::CardManagment& cardManager, std::vector<unsigned char> dieRoll);
+            void whileInJail(board::Board& board, Player& mainPlayer, std::vector<Player>& computers);
     };
 }
 

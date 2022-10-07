@@ -209,7 +209,6 @@ void card_managment::CardManagment::advanceTo(board::Board& board, player::Playe
 
 void card_managment::CardManagment::getOutOfJailFreeCard(board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers, player::Player& player, card::Card& card) {
     player.getOutOfJailFreeCards++;
-    card.flags.insert("WITHPLAYER");
 }
 
 void card_managment::CardManagment::repairHouses(board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers, player::Player& player, card::Card& card) {

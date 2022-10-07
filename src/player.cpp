@@ -18,6 +18,13 @@ player::Player::Player(bool isMainPlayer) {
 
 void player::Player::movePlayer(board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers, card_managment::CardManagment& cardManager) {
     functions::clear();
+    if (!this->inGame)
+        return;
+    if (this->inJail) {
+        this->whileInJail(board, mainPlayer, computers);
+        if (this->inJail)
+            return;
+    }
     std::vector<unsigned char> dieRoll = board.rollDice();
     int squaresToMove = dieRoll[0] + dieRoll[1];
     std::string currentSquareColor = board.getPlot(this->plotPosition).stringProperties.at("COLORCODE");
@@ -418,6 +425,78 @@ void player::Player::landOnSquare(plot::Plot& nextPlot, board::Board& board, pla
         functions::printlnRed(this->name + " is going to jail.");
         this->plotPosition = 10;
         this->inJail = true;
+    }
+}
+
+void player::Player::whileInJail(board::Board& board, Player& mainPlayer, std::vector<Player>& computers) {
+    functions::printlnRed(this->name + " has been in jail for " + std::to_string(this->turnsInJail) + " turns.");
+    functions::printlnBlue("In order to get out, they must either pay $50 or roll a double.");
+    functions::printlnGreen("If they cannot get out in three turns, they must pay $50 or go bankrupt.");
+    functions::printlnCyan("They also can reedeem a get out of jail free card. They have " + std::to_string(this->getOutOfJailFreeCards));
+    functions::printlnYellow(this->name + " has $" + std::to_string(this->cash));
+    if (this->isMainPlayer) {
+        functions::printlnMagenta("Enter (1) to pay $50 dollars, (2) to roll a dice or (3) to reedeem a get out of jail free card.");
+        int input = functions::readIntInput(">", 1, 3);
+        if (input == 1) {
+            this->reduceMoney(50, board, mainPlayer, computers, false, mainPlayer);
+            this->inJail = false;
+            this->movePlayer(board, mainPlayer, computers, cardManager);
+        } else if (input == 2) {
+            std::vector<unsigned char> roll = board.rollDice();
+            functions::printlnBlue(this->name + " rolled:");
+            std::cout << "+---+ +---+" << std::endl;
+            std::cout << "| " << std::to_string(roll[0]) << " | | " << std::to_string(roll[1]) << " |" << std::endl;
+            std::cout << "+---+ +---+" << std::endl;
+            if (roll[0] == roll[1]) {
+                functions::printlnCyan("You got out of jail!");
+                functions::readStringInput("");
+                this->inJail = false;
+                this->movePlayer(board, mainPlayer, computers, cardManager);
+            } else {
+                functions::printlnRed("You did not roll a double...");
+                functions::readStringInput("");
+                return;
+            }
+        } else {
+            if (this->getOutOfJailFreeCards = 0) {
+                functions::printlnRed("You don't have any get out of jail free cards!");
+                functions::readStringInput("");
+                this->whileInJail(board, mainPlayer, computers);
+            }
+            this->getOutOfJailFreeCards--;
+            functions::printlnRed("You used one of your get out of jail free cards!");
+            functions::readStringInput("");
+            this->inJail = false;
+            this->movePlayer(board, mainPlayer, computers, cardManager);
+        }
+    } else {
+        if (this->cash >= 50 && this->getOutOfJailFreeCards == 0) {
+            functions::printlnGreen(this->name + " payed $50 to get out of jail.");
+            functions::readStringInput("");
+            this->inJail = false;
+            this->movePlayer(board, mainPlayer, computers, cardManager);
+        } else if (this->getOutOfJailFreeCards > 0) {
+            functions::printlnRed(this->name + " used one of your get out of jail free cards!");
+            functions::readStringInput("");
+            this->inJail = false;
+            this->movePlayer(board, mainPlayer, computers, cardManager);
+        } else {
+            std::vector<unsigned char> roll = board.rollDice();
+            functions::printlnBlue(this->name + " rolled:");
+            std::cout << "+---+ +---+" << std::endl;
+            std::cout << "| " << std::to_string(roll[0]) << " | | " << std::to_string(roll[1]) << " |" << std::endl;
+            std::cout << "+---+ +---+" << std::endl;
+            if (roll[0] == roll[1]) {
+                functions::printlnCyan(this->name + " got out of jail!");
+                functions::readStringInput("");
+                this->inJail = false;
+                this->movePlayer(board, mainPlayer, computers, cardManager);
+            } else {
+                functions::printlnRed(this->name + " did not roll a double...");
+                functions::readStringInput("");
+                return;
+            }
+        }
     }
 }
 
