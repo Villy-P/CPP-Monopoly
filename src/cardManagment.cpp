@@ -45,6 +45,11 @@ void card_managment::CardManagment::createCards() {
 
 void card_managment::CardManagment::drawChanceCard() {
     card::Card card = this->chanceCards[0];
+    if (functions::setContains(card.flags, "WITHPLAYER")) {
+        this->chanceCards.pop_front();
+        this->chanceCards.push_back(card);
+        this->drawChanceCard();
+    }
     std::vector<std::string> displaySentence = functions::split(card.description, ' ');
     unsigned char lengthOfEach = displaySentence.size() / 5;
     unsigned char extraLetters = displaySentence.size() % 5;
@@ -76,6 +81,11 @@ void card_managment::CardManagment::drawChanceCard() {
 
 void card_managment::CardManagment::drawChestCard() {
     card::Card card = this->chestCards[0];
+    if (functions::setContains(card.flags, "WITHPLAYER")) {
+        this->chanceCards.pop_front();
+        this->chanceCards.push_back(card);
+        this->drawChanceCard();
+    }
     std::vector<std::string> displaySentence = functions::split(card.description, ' ');
     unsigned char lengthOfEach = displaySentence.size() / 5;
     unsigned char extraLetters = displaySentence.size() % 5;
@@ -103,6 +113,87 @@ void card_managment::CardManagment::drawChestCard() {
     this->chestCards.pop_front();
     this->chestCards.push_back(card);
     std::cout << this->chestCards.size() << std::endl;
+}
+
+void card_managment::CardManagment::redeemCard(board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers, player::Player& player, card::Card& card) {
+    if (functions::setContains(card.flags, "MONEYCHANGE")) {
+        if (std::stoi(card.properties.at("MONEYCHANGE")) > 0)
+            player.cash += std::stoi(card.properties.at("MONEYCHANGE"));
+        else
+            player.reduceMoney(std::stoi(card.properties.at("MONEYCHANGE")), board, mainPlayer, computers, false, player);
+    } 
+    if (functions::setContains(card.flags, "MOVETONEXTRAILROAD")) {
+        if (player.plotPosition < 5 || player.plotPosition > 35) {
+            if (player.plotPosition < 40) {
+                std::cout << player.name << " passes by GO. +$200" << std::endl;
+                player.cash += 200;
+            }
+            player.plotPosition = 5;
+        }
+        else if (player.plotPosition < 15)
+            player.plotPosition = 15;
+        else if (player.plotPosition < 25)
+            player.plotPosition = 25;
+        else if (player.plotPosition < 35)
+            player.plotPosition = 35;
+        player::Player whoOwns(false);
+        if (mainPlayer.ownsPlot(board.getPlot(player.plotPosition)))
+            whoOwns = mainPlayer;
+        for (player::Player p : computers)
+            if (p.ownsPlot(board.getPlot(player.plotPosition)))
+                whoOwns = p;
+        if (functions::setContains(board.getPlot(player.plotPosition).flags, "OWNEDPLOT"))
+            player.payRentOnRailroad(board.getPlot(player.plotPosition), board, mainPlayer, computers, whoOwns, true);
+    } 
+    if (functions::setContains(card.flags, "GOBACK")) {
+        player.plotPosition -= std::stoi(card.properties.at("GOBACKAMOUNT"));
+        player.landOnSquare(board.getPlot(player.plotPosition), board, mainPlayer, computers, *this, {0, 0});
+    } 
+    if (functions::setContains(card.flags, "PAYEACH")) {
+        if (player.isMainPlayer) {
+            for (player::Player& p : computers) {
+                if (player.inGame) {
+                    player.reduceMoney(std::stoi(card.properties.at("PAYEACHAMOUNT")), board, mainPlayer, computers, true, p);
+                    p.cash += std::stoi(card.properties.at("PAYEACHAMOUNT"));
+                }
+            }
+        } else {
+            player.reduceMoney(std::stoi(card.properties.at("PAYEACHAMOUNT")), board, mainPlayer, computers, true, mainPlayer);
+            mainPlayer.cash += std::stoi(card.properties.at("PAYEACHAMOUNT"));
+            for (player::Player& p : computers) {
+                if (player.inGame && p.name != player.name) {
+                    player.reduceMoney(std::stoi(card.properties.at("PAYEACHAMOUNT")), board, mainPlayer, computers, true, p);
+                    p.cash += std::stoi(card.properties.at("PAYEACHAMOUNT"));
+                }
+            }
+        }
+    } 
+    if (functions::setContains(card.flags, "ADVANCETO")) {
+        if (player.plotPosition > std::stoi(card.properties.at("ADVANCEINDEX")) && functions::setContains(card.flags, "GOTOJAIL")) {
+            std::cout << player.name << " passes by GO. +$200" << std::endl;
+            player.cash += 200;
+        }
+        player.plotPosition = std::stoi(card.properties.at("ADVANCEINDEX"));
+        player.landOnSquare(board.getPlot(player.plotPosition), board, mainPlayer, computers, *this, {0, 0});
+        if (functions::setContains(card.flags, "GOTOJAIL"))
+            player.inJail = true;
+    } 
+    if (functions::setContains(card.flags, "GETOUTOFJAILFREECARD")) {
+        player.getOutOfJailFreeCards++;
+        card.flags.insert("WITHPLAYER");
+    }
+    if (functions::setContains(card.flags, "REPAIRHOUSES")) {
+        int amount = 0;
+        for (plot::Plot& p : player.ownedPlots)
+            amount += std::stoi(card.properties.at("REPAIRHOUSESCOST")) * p.intProperties.at("HOUSES");
+        player.reduceMoney(amount, board, mainPlayer, computers, false, player);
+    }
+    if (functions::setContains(card.flags, "REPAIRHOTELS")) {
+        int amount = 0;
+        for (plot::Plot& p : player.ownedPlots)
+            amount += std::stoi(card.properties.at("REPAIRHOTELSCOST")) * p.intProperties.at("HOTELS");
+        player.reduceMoney(amount, board, mainPlayer, computers, false, player);
+    }
 }
 
 #endif

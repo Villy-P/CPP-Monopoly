@@ -15,6 +15,8 @@ namespace card_managment {
             void drawChanceCard();
             void drawChestCard();
             void createCards();
+
+            void redeemCard(board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers, player::Player& player, card::Card& card);
     };
 }
 
