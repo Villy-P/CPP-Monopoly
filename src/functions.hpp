@@ -24,18 +24,18 @@ namespace functions {
     std::vector<std::string> split(const std::string &s, char delim);
     std::vector<card::Card> shuffle(std::vector<card::Card> vec);
     bool setContains(std::unordered_set<std::string> set, std::string str);
-    void clear();
+    bool tryParse(std::string &input, int &output);
+    int readIntInput(std::string prompt, int min, int max);
     std::string center(const std::string s, const int w);
+    std::string readStringInput(std::string prompt);
+    std::string readCharInput(std::string prompt);
+    void clear();
     void printlnRed(std::string str);
     void printlnBlue(std::string str);
     void printlnGreen(std::string str);
     void printlnYellow(std::string str);
     void printlnMagenta(std::string str);
     void printlnCyan(std::string str);
-    std::string readStringInput(std::string prompt);
-    std::string readCharInput(std::string prompt);
-    bool tryParse(std::string &input, int &output);
-    int readIntInput(std::string prompt, int min, int max);
 }
 
 #endif
