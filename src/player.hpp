@@ -22,6 +22,7 @@ namespace player {
             bool inJail = false;
             unsigned char turnsInJail = 0;
             unsigned char getOutOfJailFreeCards = 0;
+            unsigned char doubles = 0;
             std::vector<plot::Plot> ownedPlots;
 
             Player(bool isMainPlayer);

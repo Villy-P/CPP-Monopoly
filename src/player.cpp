@@ -63,6 +63,20 @@ void player::Player::movePlayer(board::Board& board, player::Player& mainPlayer,
     else
         this->plotPosition = this->plotPosition + squaresToMove - board.plots.size();
     functions::readStringInput("");
+    if (dieRoll[0] == dieRoll[1]) {
+        functions::printlnBlue(this->name + "rolled a double.");
+        this->doubles++;
+        if (this->doubles == 3) {
+            this->doubles = 0;
+            functions::printlnRed(this->name + " has been speeding and must go to jail!");
+            functions::readStringInput("");
+            this->plotPosition = 10;
+            this->inJail = true;
+            return;
+        }
+        functions::readStringInput("");
+        this->movePlayer(board, mainPlayer, computers, cardManager);
+    }
 }
 
 void player::Player::reduceMoney(int amount, board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers, bool doesOwe, player::Player& oweTo) {
@@ -454,7 +468,7 @@ void player::Player::whileInJail(board::Board& board, Player& mainPlayer, std::v
                 functions::printlnRed("You did not roll a double...");
                 functions::readStringInput("");
                 this->turnsInJail++;
-                if (this->turnsInJail == 2) {
+                if (this->turnsInJail == 3) {
                     functions::printlnRed("It has been 3 turns, so you must pay $50");
                     functions::readStringInput("");
                     this->reduceMoney(50, board, mainPlayer, computers, false, mainPlayer);
@@ -498,7 +512,7 @@ void player::Player::whileInJail(board::Board& board, Player& mainPlayer, std::v
                 functions::printlnRed(this->name + " did not roll a double...");
                 functions::readStringInput("");
                 this->turnsInJail++;
-                if (this->turnsInJail == 2) {
+                if (this->turnsInJail == 3) {
                     functions::printlnRed("It has been 3 turns, so " + this->name + " must pay $50");
                     functions::readStringInput("");
                     this->reduceMoney(50, board, mainPlayer, computers, false, mainPlayer);
