@@ -56,7 +56,7 @@ void functions::printlnMagenta(std::string str) {std::cout << functions::ANSI_MA
 void functions::printlnCyan(std::string str)    {std::cout << functions::ANSI_CYAN    << str << functions::ANSI_RESET << std::endl;}
 
 bool functions::setContains(std::unordered_set<std::string> set, std::string str) {
-    return set.count(str);
+    return set.find(str) != set.end();
 }
 
 std::vector<std::string> functions::split(const std::string &s, char delim) {

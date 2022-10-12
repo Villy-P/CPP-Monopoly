@@ -3,6 +3,7 @@
 
 #include "cardManagment.hpp"
 #include "functions.cpp"
+#include "player.cpp"
 
 #include <algorithm>
 #include <random>

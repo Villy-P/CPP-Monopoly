@@ -64,7 +64,7 @@ void player::Player::movePlayer(board::Board& board, player::Player& mainPlayer,
         this->plotPosition = this->plotPosition + squaresToMove - board.plots.size();
     functions::readStringInput("");
     if (dieRoll[0] == dieRoll[1]) {
-        functions::printlnBlue(this->name + "rolled a double.");
+        functions::printlnBlue(this->name + " rolled a double.");
         this->doubles++;
         if (this->doubles == 3) {
             this->doubles = 0;
@@ -434,7 +434,7 @@ void player::Player::landOnSquare(plot::Plot& nextPlot, board::Board& board, pla
         cardManager.drawChestCard(board, mainPlayer, computers, *this);
     } else if (functions::setContains(nextPlot.flags, "CHANCE")) {
         functions::printlnGreen(this->name + " landed on a Chance square.");
-        cardManager.drawChestCard(board, mainPlayer, computers, *this);     
+        cardManager.drawChanceCard(board, mainPlayer, computers, *this);     
     } else if (functions::setContains(nextPlot.flags, "GOTOJAIL")) {
         functions::printlnRed(this->name + " is going to jail.");
         this->plotPosition = 10;
@@ -531,19 +531,40 @@ void player::Player::getOutOfJail(board::Board& board, Player& mainPlayer, std::
 }
 
 void player::Player::playerMenu(board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers) {
-    functions::printlnCyan("1: Buy Houses");
-    functions::printlnCyan("2: Buy Hotels");
-    functions::printlnCyan("3: View Opponents");
-    functions::printlnCyan("4: View Title Cards");
-    functions::printlnCyan("5: Trade with computers");
-    functions::printlnCyan("6: Mortgage property");
-    functions::printlnCyan("7: Sell Houses");
-    functions::printlnCyan("8: Sell Hotels");
-    functions::printlnCyan("9: Exit");
-    switch (functions::readIntInput(">", 1, 9)) {
-        case 1:
-            this->buyHouse(board, mainPlayer, computers);
-            break;
+    while (true) {
+        functions::printlnCyan("1: Buy Houses");
+        functions::printlnCyan("2: Buy Hotels");
+        functions::printlnCyan("3: View Opponents");
+        functions::printlnCyan("4: View Title Cards");
+        functions::printlnCyan("5: Trade with computers");
+        functions::printlnCyan("6: Mortgage property");
+        functions::printlnCyan("7: Sell Houses");
+        functions::printlnCyan("8: Sell Hotels");
+        functions::printlnCyan("9: Roll/End Turn");
+        switch (functions::readIntInput(">", 1, 9)) {
+            case 1:
+                this->buyHouse(board, mainPlayer, computers);
+                break;
+            case 3:
+                this->displayOpponents(board, computers);
+                break;
+        }
+    }
+}
+
+void player::Player::displayOpponents(board::Board& board, std::vector<player::Player>& computers) {
+    for (player::Player& p : computers) {
+        if (!p.inGame)
+            continue;
+        functions::printlnBlue(p.name);
+        functions::printlnMagenta("Located at " + board.getPlot(p.plotPosition).stringProperties.at("COLORCODE") + board.getPlot(p.plotPosition).stringProperties.at("NAMW") + functions::ANSI_RESET);
+        functions::printlnYellow("Cash: " + p.cash);
+        if (p.inJail)
+            functions::printlnRed(p.name + " is in jail.");
+        functions::printlnCyan(p.name + " owns:");
+        for (plot::Plot& plt : this->ownedPlots)
+            std::cout << plt.stringProperties.at("COLORCODE") << plt.stringProperties.at("NAME") << functions::ANSI_RESET << std::endl;
+        functions::readStringInput("");
     }
 }
 

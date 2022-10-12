@@ -50,6 +50,7 @@ namespace player {
             void getOutOfJail(board::Board& board, Player& mainPlayer, std::vector<Player>& computers, card_managment::CardManagment& cardManager);
             void playerMenu(board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers);
             void buyHouse(board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers);
+            void displayOpponents(board::Board& board, std::vector<player::Player>& computers);
     };
 }
 

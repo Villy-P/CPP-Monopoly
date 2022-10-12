@@ -124,7 +124,6 @@ void plot::Plot::auction(board::Board& board, player::Player& player, std::vecto
             input = functions::readIntInput(">", highestBidder->bid + 1, std::numeric_limits<int>::max());
             highestBidder = &player;
             player.bid = input;
-            functions::printlnBlue(std::to_string(player.bid));
         } else {
             functions::printlnRed("You have stopped bidding.");
             player.isBidding = false;
