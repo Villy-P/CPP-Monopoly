@@ -55,7 +55,8 @@ void functions::printlnYellow(std::string str)  {std::cout << functions::ANSI_YE
 void functions::printlnMagenta(std::string str) {std::cout << functions::ANSI_MAGENTA << str << functions::ANSI_RESET << std::endl;}
 void functions::printlnCyan(std::string str)    {std::cout << functions::ANSI_CYAN    << str << functions::ANSI_RESET << std::endl;}
 
-bool functions::setContains(std::unordered_set<std::string> set, std::string str) {
+bool functions::setContains(std::unordered_set<std::string>& set, std::string str) {
+    std::cout << std::to_string(set.find(str) != set.end()) << "|" << str << std::endl;
     return set.find(str) != set.end();
 }
 
