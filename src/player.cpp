@@ -285,22 +285,22 @@ unsigned char player::Player::ownedUtilities() {
 }
 
 void player::Player::payRent(plot::Plot& nextPlot, board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers, std::vector<unsigned char>& dieRoll) {
-    player::Player whoOwns(false);
+    player::Player* whoOwns;
     int previousMoney = this->cash;
     if (mainPlayer.ownsPlot(nextPlot))
-        whoOwns = mainPlayer;
+        whoOwns = &mainPlayer;
     for (player::Player p : computers)
         if (p.ownsPlot(nextPlot))
-            whoOwns = p;
-    functions::printlnRed(whoOwns.name + " owns " + nextPlot.stringProperties.at("COLORCODE") + nextPlot.stringProperties.at("NAME") + functions::ANSI_RESET);
+            whoOwns = &p;
+    functions::printlnRed(whoOwns->name + " owns " + nextPlot.stringProperties.at("COLORCODE") + nextPlot.stringProperties.at("NAME") + functions::ANSI_RESET);
     if (nextPlot.stringProperties.at("OWNER") != this->name) {
         if (functions::setContains(nextPlot.flags, "PROPERTYSQUARE"))
-            this->payRentOnProperty(nextPlot, board, mainPlayer, computers, whoOwns);
+            this->payRentOnProperty(nextPlot, board, mainPlayer, computers, *whoOwns);
         else if (functions::setContains(nextPlot.flags, "RAILROAD"))
-            this->payRentOnRailroad(nextPlot, board, mainPlayer, computers, whoOwns, false);
+            this->payRentOnRailroad(nextPlot, board, mainPlayer, computers, *whoOwns, false);
         else
-            this->payRentOnUtility(nextPlot, board, mainPlayer, computers, whoOwns, dieRoll, 0);
-        functions::printlnRed(this->name + " payed " + whoOwns.name + " $" + std::to_string(this->cash - previousMoney));
+            this->payRentOnUtility(nextPlot, board, mainPlayer, computers, *whoOwns, dieRoll, 0);
+        functions::printlnRed(this->name + " payed " + whoOwns->name + " $" + std::to_string(this->cash - previousMoney));
     }
 }
 
