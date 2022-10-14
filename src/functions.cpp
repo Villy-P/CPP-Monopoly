@@ -10,22 +10,6 @@
 #include  <iterator>
 #include <algorithm>
 
-namespace functions {
-    template<typename Iter, typename RandomGenerator>
-    Iter select_randomly(Iter start, Iter end, RandomGenerator& g) {
-        std::uniform_int_distribution<> dis(0, std::distance(start, end) - 1);
-        std::advance(start, dis(g));
-        return start;
-    }
-    
-    template<typename Iter>
-    Iter select_randomly(Iter start, Iter end) {
-        static std::random_device rd;
-        static std::mt19937 gen(rd());
-        return functions::select_randomly(start, end, gen);
-    }
-}
-
 std::vector<card::Card> functions::shuffle(std::vector<card::Card> vec) {
     static auto rng = std::default_random_engine {};
     std::shuffle(std::begin(vec), std::end(vec), rng);
