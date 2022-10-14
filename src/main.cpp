@@ -77,6 +77,12 @@ int main(void) {
     functions::printlnGreen(mover->name + " will be moving first!");
     functions::readStringInput("");
     while (true) {
+        if (getPlayersInGame(player, computers) == 1) {
+            functions::printlnBlue("You have won the game!");
+            functions::printlnBlue("Press ENTER to abort");
+            functions::readStringInput("");
+            exit(0);
+        }
         mover->movePlayer(board, player, computers, cardManager);
         if (mover->isMainPlayer)
             mover = &computers[moverIndex];
@@ -87,4 +93,14 @@ int main(void) {
         else
             mover = &computers[++moverIndex];
     }
+}
+
+unsigned char getPlayersInGame(player::Player& mainPlayer, std::vector<player::Player>& computers) {
+    unsigned char playersStillInGame = 0;
+    if (mainPlayer.inGame)
+        playersStillInGame++;
+    for (player::Player& player : computers)
+        if (player.inGame)
+            playersStillInGame++;
+    return playersStillInGame;
 }

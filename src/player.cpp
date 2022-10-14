@@ -550,11 +550,13 @@ void player::Player::playerMenu(board::Board& board, player::Player& mainPlayer,
             case 3:
                 this->displayOpponents(board, computers);
                 break;
+            case 4:
+                this->displayTitleCards();
         }
     }
 }
 
-void player::Player::displayTitleCards(board::Board& board) {
+void player::Player::displayTitleCards() {
     functions::clear();
     for (plot::Plot& p : this->ownedPlots) {
         if (functions::setContains(p.flags, "PROPERTYSQUARE")) {
