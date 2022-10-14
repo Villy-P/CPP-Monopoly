@@ -33,6 +33,7 @@ namespace player {
             bool ownsColorSet(std::string color);
             bool canBuyBuilding();
             bool canBuyHouseOnPlot(plot::Plot& plot);
+            bool canBuyHotelOnPlot(plot::Plot& plot);
             bool doesPlayerOwnFourHouses();
             unsigned char ownedRailroads();
             unsigned char ownedUtilities();
