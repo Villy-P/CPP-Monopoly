@@ -13,7 +13,7 @@
 std::vector<card::Card> functions::shuffle(std::vector<card::Card> vec) {
     static auto rng = std::default_random_engine {};
     std::shuffle(std::begin(vec), std::end(vec), rng);
-    return vec; // this is a copy of the vector
+    return vec;
 
 }
 

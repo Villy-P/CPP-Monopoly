@@ -33,6 +33,7 @@ namespace player {
             bool ownsColorSet(std::string color);
             bool canBuyBuilding();
             bool canBuyHouseOnPlot(plot::Plot& plot);
+            bool doesPlayerOwnFourHouses();
             unsigned char ownedRailroads();
             unsigned char ownedUtilities();
             void computerBankruptcy(board::Board& board, std::vector<Player>& computers, Player& mainPlayer, bool doesOwe, Player& oweTo);
@@ -50,6 +51,7 @@ namespace player {
             void getOutOfJail(board::Board& board, Player& mainPlayer, std::vector<Player>& computers, card_managment::CardManagment& cardManager);
             void playerMenu(board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers);
             void buyHouse(board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers);
+            void buyHotel(board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers);
             void displayOpponents(board::Board& board, std::vector<player::Player>& computers);
             void displayTitleCards();
     };

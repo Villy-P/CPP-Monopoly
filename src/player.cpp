@@ -552,6 +552,9 @@ void player::Player::playerMenu(board::Board& board, player::Player& mainPlayer,
                 break;
             case 4:
                 this->displayTitleCards();
+                break;
+            case 9:
+                return;
         }
     }
 }
@@ -587,6 +590,73 @@ void player::Player::displayOpponents(board::Board& board, std::vector<player::P
             std::cout << " that has " << plt.stringProperties.at("HOUSES") << " houses and " << plt.stringProperties.at("HOTELS") << " hotels" << std::endl;
         }
         functions::readStringInput("");
+    }
+}
+
+void player::Player::buyHotel(board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers) {
+    if (!this->canBuyBuilding()) {
+        if (this->isMainPlayer) {
+            functions::printlnRed("You do not own any color sets");
+            functions::readStringInput("");
+        }
+        return;
+    }
+    if (!this->doesPlayerOwnFourHouses()) {
+        if (this->isMainPlayer) {
+            functions::printlnRed("You do not have a property that has 4 houses");
+            functions::readStringInput("");
+        }
+        return;
+    }
+    if (this->isMainPlayer) {
+        functions::printlnBlue("You must first have four houses on all properties in a color set to buy hotels.");
+        for (int i = 0; i < this->ownedPlots.size(); i++) {
+            std::cout << this->ownedPlots[i].stringProperties.at("COLORCODE") << std::to_string(i + 1) << ": " << this->ownedPlots[i].stringProperties.at("NAME");
+            std::cout << " with " << std::to_string(this->ownedPlots[i].intProperties.at("HOUSES")) << " houses.";
+            std::cout << " A hotel there costs " << std::to_string(this->ownedPlots[i].intProperties.at("HOTELSCOST")) << functions::ANSI_RESET << std::endl;
+        }
+        functions::printlnRed("Enter 0 to exit");
+        int input = functions::readIntInput(">", 0, this->ownedPlots.size());
+        if (input == 0)
+            return;
+        if (!this->ownsColorSet(this->ownedPlots[input - 1].stringProperties.at("COLORCODE"))) {
+            functions::printlnRed("You do not own that color set.");
+            functions::readStringInput("");
+            this->buyHotel(board, mainPlayer, computers);
+        } else if (!this->canBuyHouseOnPlot(this->ownedPlots[input - 1])) {
+            functions::printlnRed("You must build houses equally.");
+            functions::readStringInput("");
+            this->buyHotel(board, mainPlayer, computers);
+        } else if (this->ownedPlots[input - 1].intProperties.at("HOUSES") == 4) {
+            functions::printlnRed("You already have 4 houses there. Build a hotel instead.");
+            functions::readStringInput("");
+            this->buyHotel(board, mainPlayer, computers);
+        } else if (this->ownedPlots[input - 1].intProperties.at("HOTELS") == 1) {
+            functions::printlnRed("You already have a hotel there.");
+            functions::readStringInput("");
+            this->buyHotel(board, mainPlayer, computers);
+        } else if (this->cash < this->ownedPlots[input - 1].intProperties.at("HOUSESCOST")) {
+            functions::printlnRed("You can't afford a house there.");
+            functions::readStringInput("");
+            this->buyHotel(board, mainPlayer, computers);
+        }
+        this->ownedPlots[input - 1].intProperties.at("HOUSES") += 1;
+        this->reduceMoney(this->ownedPlots[input - 1].intProperties.at("HOUSESCOST"), board, mainPlayer, computers, false, mainPlayer);
+    } else {
+        for (plot::Plot& p : this->ownedPlots) {
+            if (
+                this->ownsColorSet(p.stringProperties.at("COLORCODE")) &&
+                this->canBuyHouseOnPlot(p) &&
+                p.intProperties.at("HOUSES") != 4 &&
+                p.intProperties.at("HOTELS") != 1 &&
+                this->cash >= p.intProperties.at("HOUSESCOST")
+            ) {
+                functions::printlnBlue(this->name + " bought a house on " + p.stringProperties.at("NAME"));
+                p.intProperties.at("HOUSES") += 1;
+                this->reduceMoney(p.intProperties.at("HOUSESCOST"), board, mainPlayer, computers, false, mainPlayer);
+                return;
+            }
+        }
     }
 }
 
@@ -666,6 +736,13 @@ bool player::Player::canBuyHouseOnPlot(plot::Plot& plot) {
             return false;
     }
     return true;
+}
+
+bool player::Player::doesPlayerOwnFourHouses() {
+    for (plot::Plot& p : this->ownedPlots)
+        if (p.intProperties.at("HOUSES") == 4)
+            return true;
+    return false;
 }
 
 #endif
