@@ -554,7 +554,23 @@ void player::Player::playerMenu(board::Board& board, player::Player& mainPlayer,
     }
 }
 
+void player::Player::displayTitleCards(board::Board& board) {
+    functions::clear();
+    for (plot::Plot& p : this->ownedPlots) {
+        if (functions::setContains(p.flags, "PROPERTYSQUARE")) {
+            p.displayTitleCard();
+            std::cout << "This property has " << p.stringProperties.at("HOUSES") << " houses and " << p.stringProperties.at("HOTELS") << " hotels" << std::endl;
+        } else if (functions::setContains(p.flags, "RAILROAD")) {
+            p.displayRailroadCard();
+        } else {
+            p.displayUtilityCard();
+        }
+    }
+    functions::readStringInput("");
+}
+
 void player::Player::displayOpponents(board::Board& board, std::vector<player::Player>& computers) {
+    functions::clear();
     for (player::Player& p : computers) {
         if (!p.inGame)
             continue;
@@ -564,8 +580,10 @@ void player::Player::displayOpponents(board::Board& board, std::vector<player::P
         if (p.inJail)
             functions::printlnRed(p.name + " is in jail.");
         functions::printlnCyan(p.name + " owns:");
-        for (plot::Plot& plt : this->ownedPlots)
-            std::cout << plt.stringProperties.at("COLORCODE") << plt.stringProperties.at("NAME") << functions::ANSI_RESET << std::endl;
+        for (plot::Plot& plt : this->ownedPlots) {
+            std::cout << plt.stringProperties.at("COLORCODE") << plt.stringProperties.at("NAME") << functions::ANSI_RESET;
+            std::cout << " that has " << plt.stringProperties.at("HOUSES") << " houses and " << plt.stringProperties.at("HOTELS") << " hotels" << std::endl;
+        }
         functions::readStringInput("");
     }
 }
