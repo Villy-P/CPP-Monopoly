@@ -563,6 +563,18 @@ void player::Player::playerMenu(board::Board& board, player::Player& mainPlayer,
     }
 }
 
+void player::Player::mortgatgeProperty() {
+    functions::printlnBlue("Here are your unmortgaged properties: ");
+    for (int i = 0; i < this->ownedPlots.size(); i++) {
+        std::cout << std::to_string(i + 1) << this->ownedPlots[i].stringProperties.at("COLORCODE") << this->ownedPlots[i].stringProperties.at("NAME") << " which is";
+        std::cout << (functions::setContains(this->ownedPlots[i].flags, "MORTGAGED") ? " mortgaged." : " unmortgaged.") << functions::ANSI_RESET << std::endl;
+    }
+    functions::printlnRed("Enter 0 to exit");
+    int input = functions::readIntInput(">", 0, this->ownedPlots.size());
+    if (input == 0)
+        return;
+}
+
 void player::Player::displayTitleCards() {
     functions::clear();
     for (plot::Plot& p : this->ownedPlots) {
