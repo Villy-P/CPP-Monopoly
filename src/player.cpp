@@ -563,16 +563,72 @@ void player::Player::playerMenu(board::Board& board, player::Player& mainPlayer,
             case 7:
                 this->unmortgageProperty();
                 break;
+            case 8:
+                this->sellHotel();
+                break;
+            case 9:
+                this->sellHouse(board);
+                break;
             case 10:
                 return;
         }
     }
 }
 
+void player::Player::sellHouse(board::Board& board) {
+    functions::clear();
+    for (int i = 0; i < this->ownedPlots.size(); i++) {
+        std::cout << std::to_string(i + 1) << ": " << this->ownedPlots[i].stringProperties.at("COLORCODE") << this->ownedPlots[i].stringProperties.at("NAME") << "that has ";
+        std::cout << std::to_string(this->ownedPlots[i].intProperties.at("HOUSES")) << " houses." << " A house there costs $";
+        std::cout << std::to_string(this->ownedPlots[i].intProperties.at("HOUSESCOST")) << functions::ANSI_RESET << std::endl;
+    }
+    functions::printlnRed("Enter 0 to exit");
+    int input = functions::readIntInput(">", 0, this->ownedPlots.size());
+    if (input == 0)
+        return;
+    if (this->ownedPlots[input - 1].intProperties.at("HOUSES") == 0) {
+        functions::printlnRed("That proeprty has no houses. Try again.");
+        functions::readStringInput("");
+        this->sellHouse(board);
+    }
+    for (plot::Plot p : board.plots) {
+        if (functions::setContains(p.flags, "PROPERTYSQUARE") && p.stringProperties.at("COLORCODE") == this->ownedPlots[input - 1].stringProperties.at("COLORCODE")) {
+            if (p.intProperties.at("HOUSES") < this->ownedPlots[input - 1].intProperties.at("HOUSES") - 1) {
+                functions::printlnRed("You need to sell houses equally!");
+                functions::readStringInput("");
+                this->sellHouse(board);
+            }
+        }
+    }
+    this->ownedPlots[input - 1].intProperties.at("HOUSES") -= 1;
+    this->cash += this->ownedPlots[input - 1].intProperties.at("HOUSESCOST") / 2;
+}
+
+void player::Player::sellHotel() {
+    functions::clear();
+    for (int i = 0; i < this->ownedPlots.size(); i++) {
+        std::cout << std::to_string(i + 1) << ": " << this->ownedPlots[i].stringProperties.at("COLORCODE") << this->ownedPlots[i].stringProperties.at("NAME") << "that has ";
+        std::cout << std::to_string(this->ownedPlots[i].intProperties.at("HOTELS")) << " hotels." << " A hotel there costs $";
+        std::cout << std::to_string(this->ownedPlots[i].intProperties.at("HOTELSCOST")) << functions::ANSI_RESET << std::endl;
+    }
+    functions::printlnRed("Enter 0 to exit");
+    int input = functions::readIntInput(">", 0, this->ownedPlots.size());
+    if (input == 0)
+        return;
+    if (this->ownedPlots[input - 1].intProperties.at("HOTELS") == 0) {
+        functions::printlnRed("There is no hotel on that square!");
+        functions::readStringInput("");
+        this->sellHotel();
+    }
+    this->ownedPlots[input - 1].intProperties.at("HOTELS") = 0;
+    this->ownedPlots[input - 1].intProperties.at("HOUSES") = 4;
+    this->cash += this->ownedPlots[input - 1].intProperties.at("HOTELSCOST") / 2;
+}
+
 void player::Player::mortgageProperty() {
     functions::clear();
     for (int i = 0; i < this->ownedPlots.size(); i++) {
-        std::cout << std::to_string(i + 1) << this->ownedPlots[i].stringProperties.at("COLORCODE") << this->ownedPlots[i].stringProperties.at("NAME") << " which is";
+        std::cout << std::to_string(i + 1) << ": " << this->ownedPlots[i].stringProperties.at("COLORCODE") << this->ownedPlots[i].stringProperties.at("NAME") << " which is";
         std::cout << (functions::setContains(this->ownedPlots[i].flags, "MORTGAGED") ? " mortgaged." : " unmortgaged.") << " It has a mortgage value of $";
         std::cout << std::to_string(this->ownedPlots[i].intProperties.at("MORTGAGEVALUE")) << functions::ANSI_RESET << std::endl;
     }

@@ -57,6 +57,8 @@ namespace player {
             void displayTitleCards();
             void mortgageProperty();
             void unmortgageProperty();
+            void sellHouse(board::Board& board);
+            void sellHotel();
     };
 }
 
