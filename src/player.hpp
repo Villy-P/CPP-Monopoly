@@ -55,7 +55,8 @@ namespace player {
             void buyHotel(board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers);
             void displayOpponents(board::Board& board, std::vector<player::Player>& computers);
             void displayTitleCards();
-            void mortgatgeProperty();
+            void mortgageProperty();
+            void unmortgageProperty();
     };
 }
 

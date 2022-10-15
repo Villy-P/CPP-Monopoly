@@ -558,7 +558,10 @@ void player::Player::playerMenu(board::Board& board, player::Player& mainPlayer,
                 this->displayTitleCards();
                 break;
             case 6:
-                this->mortgatgeProperty();
+                this->mortgageProperty();
+                break;
+            case 7:
+                this->unmortgageProperty();
                 break;
             case 10:
                 return;
@@ -566,7 +569,7 @@ void player::Player::playerMenu(board::Board& board, player::Player& mainPlayer,
     }
 }
 
-void player::Player::mortgatgeProperty() {
+void player::Player::mortgageProperty() {
     functions::clear();
     for (int i = 0; i < this->ownedPlots.size(); i++) {
         std::cout << std::to_string(i + 1) << this->ownedPlots[i].stringProperties.at("COLORCODE") << this->ownedPlots[i].stringProperties.at("NAME") << " which is";
@@ -580,11 +583,36 @@ void player::Player::mortgatgeProperty() {
     if (functions::setContains(this->ownedPlots[input - 1].flags, "MORTGAGED")) {
         functions::printlnRed("That property is already mortgaged. Try unmortgaging it.");
         functions::readStringInput("");
-        this->mortgatgeProperty();
+        this->mortgageProperty();
     }
     this->ownedPlots[input - 1].flags.insert("MORTGAGED");
     this->cash += this->ownedPlots[input - 1].intProperties.at("MORTGAGEDVALUE");
     functions::printlnGreen("You have mortgaged that property.");
+}
+
+void player::Player::unmortgageProperty() {
+    functions::clear();
+    for (int i = 0; i < this->ownedPlots.size(); i++) {
+        std::cout << std::to_string(i + 1) << this->ownedPlots[i].stringProperties.at("COLORCODE") << this->ownedPlots[i].stringProperties.at("NAME") << " which is";
+        std::cout << (functions::setContains(this->ownedPlots[i].flags, "MORTGAGED") ? " mortgaged." : " unmortgaged.") << " It has a mortgage value of $";
+        std::cout << std::to_string(this->ownedPlots[i].intProperties.at("UNMORTGAGEVALUE")) << functions::ANSI_RESET << std::endl;
+    }
+    functions::printlnRed("Enter 0 to exit");
+    int input = functions::readIntInput(">", 0, this->ownedPlots.size());
+    if (input == 0)
+        return;
+    if (functions::setContains(this->ownedPlots[input - 1].flags, "UNMORTGAGE")) {
+        functions::printlnRed("That property is already unmortgaged.");
+        functions::readStringInput("");
+        this->unmortgageProperty();
+    } else if (this->cash < this->ownedPlots[input - 1].intProperties.at("UNMORTGAGEVALUE")) {
+        functions::printlnRed("You can't afford that!.");
+        functions::readStringInput("");
+        this->unmortgageProperty();
+    }
+    this->ownedPlots[input - 1].flags.erase("MORTGAGED");
+    this->cash -= this->ownedPlots[input - 1].intProperties.at("UNMORTGAGEVALUE");
+    functions::printlnGreen("You have unmortgaged that property.");
 }
 
 void player::Player::displayTitleCards() {
