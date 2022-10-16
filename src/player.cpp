@@ -716,11 +716,21 @@ void player::Player::trade(board::Board& board, std::vector<player::Player>& com
         whoToTradeTo->getOutOfJailFreeCards += howManyCardsToGive;
         for (plot::Plot* p : plotsToGive) {
             whoToTradeTo->ownedPlots.push_back(*p);
-            this->ownedPlots.erase(std::remove(this->ownedPlots.begin(), this->ownedPlots.end(), p), this->ownedPlots.end());
+            for (std::vector<plot::Plot>::iterator it = this->ownedPlots.begin(); it != this->ownedPlots.end(); ++it) {//Error 2-4
+                if (it->stringProperties.at("NAME") == p->stringProperties.at("NAME")) {
+                    this->ownedPlots.erase(it);
+                    break;
+                }
+            }
         }
         for (plot::Plot* p : plotsToRecieve) {
             this->ownedPlots.push_back(*p);
-            whoToTradeTo->ownedPlots.erase(std::remove(this->ownedPlots.begin(), this->ownedPlots.end(), p), this->ownedPlots.end());
+            for (std::vector<plot::Plot>::iterator it = whoToTradeTo->ownedPlots.begin(); it != whoToTradeTo->ownedPlots.end(); ++it) {//Error 2-4
+                if (it->stringProperties.at("NAME") == p->stringProperties.at("NAME")) {
+                    whoToTradeTo->ownedPlots.erase(it);
+                    break;
+                }
+            }
         }
     } else {
         functions::printlnRed(whoToTradeTo->name + " rejected your trade!");

@@ -74,7 +74,6 @@ int main(void) {
         computers[i].identifier = computerIdentifiers[i];
         functions::printlnRed(computers[i].name + " as " + computers[i].identifier);
     }
-    player.trade(board, computers);
     std::vector<unsigned char> playerDice = board.rollDice();
     unsigned char firstMoverCount = playerDice[0] + playerDice[1];
     player::Player* mover = &player;
