@@ -95,7 +95,15 @@ int main(void) {
             functions::readStringInput("");
             exit(0);
         }
+        if (mover->isMainPlayer) {
+            mover->playerMenu(board, player, computers);
+        } else {
+            mover->buyHouse(board, player, computers);
+            mover->buyHotel(board, player, computers);
+        }
         mover->movePlayer(board, player, computers, cardManager);
+        if (mover->isMainPlayer)
+            mover->playerMenu(board, player, computers);
         if (mover->isMainPlayer)
             mover = &computers[moverIndex];
         else if (mover->name == "Computer #" + std::to_string(computers.size() - 1)) {
