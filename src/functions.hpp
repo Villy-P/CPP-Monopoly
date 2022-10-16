@@ -22,6 +22,7 @@ namespace functions {
     std::string ANSI_PURPLE    = "\033[38;5;127m";
 
     std::vector<std::string> split(const std::string &s, char delim);
+    std::vector<int> getConsoleDimensions();
     std::vector<card::Card> shuffle(std::vector<card::Card> vec);
     bool setContains(std::unordered_set<std::string>& set, std::string str);
     bool tryParse(std::string &input, int &output);

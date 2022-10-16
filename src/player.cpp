@@ -93,7 +93,7 @@ void player::Player::reduceMoney(int amount, board::Board& board, player::Player
                     functions::printlnGreen("However there is still hope. You have " + std::to_string(this->getOutOfJailFreeCards) + " get out of jail free cards.");
                     functions::printlnBlue("You can attempt to trade them to one of the computers for some cash.");
                     functions::printlnBlue("You need to raise $" + std::to_string(this->cash - this->moneyCanMake()));
-                    int amountToSell = functions::readIntInput("Enter an amount to sell your card(s): >", this->cash - this->moneyCanMake(), std::numeric_limits<int>::max());
+                    int amountToSell = functions::readIntInput("Enter an amount to sell your card(s): >", this->cash - this->moneyCanMake(), 2147483647);
                     for (player::Player p : computers) {
                         int pity = rand() % (10) + 1;
                         if ((amountToSell > 50 * this->getOutOfJailFreeCards || pity <= 7) && p.cash >= amountToSell) {
@@ -557,6 +557,8 @@ void player::Player::playerMenu(board::Board& board, player::Player& mainPlayer,
             case 4:
                 this->displayTitleCards();
                 break;
+            case 5:
+                this->trade(board, computers);
             case 6:
                 this->mortgageProperty();
                 break;
@@ -573,6 +575,165 @@ void player::Player::playerMenu(board::Board& board, player::Player& mainPlayer,
                 return;
         }
     }
+}
+
+std::string leftRightAdjust(std::string leftContent, std::string rightContent, int length) {
+    return " " + leftContent + std::string(length - 2 - leftContent.length() - rightContent.length(), ' ') + rightContent + " ";
+}
+
+void player::Player::trade(board::Board& board, std::vector<player::Player>& computers) {
+    functions::clear();
+    functions::printlnBlue("First, pick a computer to trade with.");
+    functions::printlnMagenta("You must pick a computer that is still alive.");
+    for (int i = 0; i < computers.size(); i++)
+        std::cout << std::to_string(i + 1) << ": " << computers[i].name << " who is " << (computers[i].inGame ? "still alive" : "not alive") << std::endl;
+    functions::printlnRed("Enter 0 to exit.");
+    int input = functions::readIntInput(">", 0, computers.size());
+    if (input == 0)
+        return;
+    player::Player* whoToTradeTo = &computers[input - 1];
+    if (!whoToTradeTo->inGame) {
+        functions::printlnRed(whoToTradeTo->name + " is not in the game!");
+        functions::readStringInput("");
+        this->trade(board, computers);
+    }
+    functions::clear();
+    std::vector<int> dimensions = functions::getConsoleDimensions();
+    int columns = dimensions[0];
+    functions::printlnRed("Ok, here are you and " + whoToTradeTo->name + "'s stats.");
+    std::cout << leftRightAdjust(this->name, whoToTradeTo->name, columns) << std::endl;
+    std::cout << leftRightAdjust("$" + std::to_string(this->cash), "$" + std::to_string(whoToTradeTo->cash), columns) << std::endl;
+    std::cout << std::endl;
+    std::cout << leftRightAdjust("PROPERTIES:", "PROPERTIES:", columns) << std::endl;
+    std::vector<std::vector<std::string>> properties;
+    for (int i = 0; i < this->ownedPlots.size(); i++)
+        properties[i][0] = this->ownedPlots[i].stringProperties.at("COLORCODE") + this->ownedPlots[i].stringProperties.at("NAME") + functions::ANSI_RESET;
+    for (int i = 0; i < whoToTradeTo->ownedPlots.size(); i++)
+        properties[i][1] = whoToTradeTo->ownedPlots[i].stringProperties.at("COLORCODE") + whoToTradeTo->ownedPlots[i].stringProperties.at("NAME") + functions::ANSI_RESET;
+    for (std::vector<std::string> vec : properties) {
+        std::string firstValue, secondValue;
+        try {
+            firstValue = vec[0];
+        } catch (...) {
+            firstValue = "";
+        } try {
+            secondValue = vec[1];
+        } catch (...) {
+            secondValue = "";
+        }
+        std::cout << leftRightAdjust(firstValue, secondValue, columns) << std::endl;
+    }
+    std::cout << std::endl;
+    std::cout << leftRightAdjust(std::to_string(this->getOutOfJailFreeCards) + " get out of jail free cards.", std::to_string(whoToTradeTo->getOutOfJailFreeCards) + " get out of jail free cards.", columns) << std::endl;
+    functions::printlnMagenta("First, enter how much money you want to give in the trade. You can just enter 0 if you only want to trade properties and get out of jail free cards.");
+    functions::printlnBlue("For reference, you have $" + std::to_string(this->cash));
+    int cashToGive = functions::readIntInput(">", 0, this->cash);
+    functions::printlnMagenta("Next, enter how much money you want to recieve.");
+    functions::printlnBlue("For reference, he has $" + std::to_string(whoToTradeTo->cash));
+    int cashToRecieve = functions::readIntInput(">", 0, whoToTradeTo->cash);
+    functions::printlnMagenta("Alright, here are your properties: ");
+    for (int i = 0; i < this->ownedPlots.size(); i++)
+        std::cout << std::to_string(i + 1) << this->ownedPlots[i].stringProperties.at("COLORCODE") << this->ownedPlots[i].stringProperties.at("NAME") << functions::ANSI_RESET << std::endl;
+    std::vector<plot::Plot*> plotsToGive;
+    std::vector<int> plotsToGiveIndex;
+    functions::printlnCyan("Select properties to give");
+    while (true) {
+        functions::printlnRed("Enter a the corresponding number to trade a property. Enter 0 to stop.");
+        int plotToGive = functions::readIntInput(">", 0, this->ownedPlots.size());
+        if (plotToGive == 0)
+            break;
+        if (std::find(plotsToGiveIndex.begin(), plotsToGiveIndex.end(), plotToGive) != plotsToGiveIndex.end()) {
+            functions::printlnBlue("You already have selected that property to be traded");
+            functions::readStringInput("");
+            continue;
+        }
+        if (this->ownedPlots[plotToGive - 1].intProperties.at("HOUSES") > 0 || this->ownedPlots[plotToGive - 1].intProperties.at("HOTELS") > 0) {
+            functions::printlnBlue("That property has building on it.");
+            functions::readStringInput("");
+            continue;
+        }
+        plotsToGive.push_back(&this->ownedPlots[plotToGive - 1]);
+    }
+    functions::printlnMagenta("Alright, here are his properties: ");
+    for (int i = 0; i < whoToTradeTo->ownedPlots.size(); i++)
+        std::cout << std::to_string(i + 1) << whoToTradeTo->ownedPlots[i].stringProperties.at("COLORCODE") << whoToTradeTo->ownedPlots[i].stringProperties.at("NAME") << functions::ANSI_RESET << std::endl;
+    std::vector<plot::Plot*> plotsToRecieve;
+    std::vector<int> plotsToRecieveIndex;
+    functions::printlnCyan("Select properties to recieve");
+    while (true) {
+        functions::printlnRed("Enter a the corresponding number to trade a property. Enter 0 to stop.");
+        int plotToRecieve = functions::readIntInput(">", 0, whoToTradeTo->ownedPlots.size());
+        if (plotToRecieve == 0)
+            break;
+        if (std::find(plotsToRecieveIndex.begin(), plotsToRecieveIndex.end(), plotToRecieve) != plotsToRecieveIndex.end()) {
+            functions::printlnBlue("You already have selected that property to be traded");
+            functions::readStringInput("");
+            continue;
+        }
+        if (whoToTradeTo->ownedPlots[plotToRecieve - 1].intProperties.at("HOUSES") > 0 || whoToTradeTo->ownedPlots[plotToRecieve - 1].intProperties.at("HOTELS") > 0) {
+            functions::printlnBlue("That property has building on it.");
+            functions::readStringInput("");
+            continue;
+        }
+        plotsToRecieve.push_back(&whoToTradeTo->ownedPlots[plotToRecieve - 1]);
+    }
+    int howManyCardsToGive;
+    if (this->getOutOfJailFreeCards > 0) {
+        functions::printlnMagenta("You have " + std::to_string(this->getOutOfJailFreeCards) + " get out of jail free cards.");
+        functions::printlnBlue("How many do you want to trade?");
+        howManyCardsToGive = functions::readIntInput(">", 0, this->getOutOfJailFreeCards);
+    }
+    int howManyCardsToRecieve;
+    if (whoToTradeTo->getOutOfJailFreeCards > 0) {
+        functions::printlnMagenta("He has " + std::to_string(whoToTradeTo->getOutOfJailFreeCards) + " get out of jail free cards.");
+        functions::printlnBlue("How many do you want to trade?");
+        howManyCardsToRecieve = functions::readIntInput(">", 0, whoToTradeTo->getOutOfJailFreeCards);
+    }
+    functions::printlnGreen("Ok, just to go over everything");
+    functions::printlnYellow("You will give " + whoToTradeTo->name + ": ");
+    functions::printlnGreen("$" + std::to_string(cashToGive));
+    for (plot::Plot* p : plotsToGive)
+        std::cout << p->stringProperties.at("COLORCODE") << p->stringProperties.at("NAME") << functions::ANSI_RESET << std::endl;
+    functions::printlnMagenta(std::to_string(howManyCardsToGive) + " get out of jail free cards");
+    functions::printlnRed("In exchange for:");
+    functions::printlnGreen("$" + std::to_string(cashToRecieve));
+    for (plot::Plot* p : plotsToRecieve)
+        std::cout << p->stringProperties.at("COLORCODE") << p->stringProperties.at("NAME") << functions::ANSI_RESET << std::endl;
+    functions::printlnMagenta(std::to_string(howManyCardsToRecieve) + " get out of jail free cards");
+    int isCorrect = functions::readIntInput("Enter 0 to back out of the trade and 1 to offer the trade.", 0, 1);
+    if (isCorrect == 0)
+        return;
+    if (this->moneyInTrade(cashToGive, plotsToGive, howManyCardsToGive) <= this->moneyInTrade(cashToRecieve, plotsToRecieve, howManyCardsToRecieve)) {
+        functions::printlnRed(whoToTradeTo->name + " accepted your trade!");
+        functions::readStringInput("");
+        whoToTradeTo->cash += cashToGive;
+        this->cash -= cashToGive;
+        whoToTradeTo->cash -= cashToRecieve;
+        this->cash += cashToRecieve;
+        this->getOutOfJailFreeCards += howManyCardsToRecieve;
+        whoToTradeTo->getOutOfJailFreeCards -= howManyCardsToRecieve;
+        this->getOutOfJailFreeCards -= howManyCardsToGive;
+        whoToTradeTo->getOutOfJailFreeCards += howManyCardsToGive;
+        for (plot::Plot* p : plotsToGive) {
+            whoToTradeTo->ownedPlots.push_back(*p);
+            this->ownedPlots.erase(std::remove(this->ownedPlots.begin(), this->ownedPlots.end(), p), this->ownedPlots.end());
+        }
+        for (plot::Plot* p : plotsToRecieve) {
+            this->ownedPlots.push_back(*p);
+            whoToTradeTo->ownedPlots.erase(std::remove(this->ownedPlots.begin(), this->ownedPlots.end(), p), this->ownedPlots.end());
+        }
+    } else {
+        functions::printlnRed(whoToTradeTo->name + " rejected your trade!");
+        functions::readStringInput("");
+    }
+    functions::clear();
+}
+
+int player::Player::moneyInTrade(int moneyToGive, std::vector<plot::Plot*>& plots, int cardsToGive) {
+    int money = moneyToGive + (cardsToGive * 49);
+    for (plot::Plot* p : plots)
+        money += p->intProperties.at("PRICE");
+    return money;
 }
 
 void player::Player::sellHouse(board::Board& board) {

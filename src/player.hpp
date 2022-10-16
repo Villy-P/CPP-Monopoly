@@ -28,6 +28,7 @@ namespace player {
             Player(bool isMainPlayer);
 
             int moneyCanMake();
+            int moneyInTrade(int moneyToGive, std::vector<plot::Plot*>& plots, int cardsToGive);
             void movePlayer(board::Board& board, Player& mainPlayer, std::vector<Player>& computers, card_managment::CardManagment& cardManager);
             bool ownsPlot(plot::Plot& plot);
             bool ownsColorSet(std::string color);
@@ -59,6 +60,7 @@ namespace player {
             void unmortgageProperty();
             void sellHouse(board::Board& board);
             void sellHotel();
+            void trade(board::Board& board, std::vector<player::Player>& computers);
     };
 }
 

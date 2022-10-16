@@ -9,6 +9,7 @@
 #include  <random>
 #include  <iterator>
 #include <algorithm>
+#include <windows.h>
 
 std::vector<card::Card> functions::shuffle(std::vector<card::Card> vec) {
     static auto rng = std::default_random_engine {};
@@ -32,6 +33,15 @@ std::string functions::center(const std::string s, const int w) {
     return ss.str();
 }
 
+std::vector<int> functions::getConsoleDimensions() {
+    CONSOLE_SCREEN_BUFFER_INFO info;
+    std::vector<int> dimensions;
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info);
+    dimensions.push_back(info.srWindow.Right - info.srWindow.Left + 1);
+    dimensions.push_back(info.srWindow.Bottom - info.srWindow.Top + 1);
+    return dimensions;
+}
+
 void functions::printlnRed(std::string str)     {std::cout << functions::ANSI_RED     << str << functions::ANSI_RESET << std::endl;}
 void functions::printlnBlue(std::string str)    {std::cout << functions::ANSI_BLUE    << str << functions::ANSI_RESET << std::endl;}
 void functions::printlnGreen(std::string str)   {std::cout << functions::ANSI_GREEN   << str << functions::ANSI_RESET << std::endl;}
@@ -40,7 +50,6 @@ void functions::printlnMagenta(std::string str) {std::cout << functions::ANSI_MA
 void functions::printlnCyan(std::string str)    {std::cout << functions::ANSI_CYAN    << str << functions::ANSI_RESET << std::endl;}
 
 bool functions::setContains(std::unordered_set<std::string>& set, std::string str) {
-    std::cout << std::to_string(set.find(str) != set.end()) << "|" << str << std::endl;
     return set.find(str) != set.end();
 }
 

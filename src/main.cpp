@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <chrono>
 #include <thread>
+#include <windows.h>
 
 std::string colorMenu() {
     std::cout << "Next, pick a color!" << std::endl;
@@ -27,6 +28,16 @@ std::string colorMenu() {
         case 6:     return functions::ANSI_CYAN;
     }
     return functions::ANSI_WHITE;
+}
+
+unsigned char getPlayersInGame(player::Player& mainPlayer, std::vector<player::Player>& computers) {
+    unsigned char playersStillInGame = 0;
+    if (mainPlayer.inGame)
+        playersStillInGame++;
+    for (player::Player& player : computers)
+        if (player.inGame)
+            playersStillInGame++;
+    return playersStillInGame;
 }
 
 int main(void) {
@@ -63,6 +74,7 @@ int main(void) {
         computers[i].identifier = computerIdentifiers[i];
         functions::printlnRed(computers[i].name + " as " + computers[i].identifier);
     }
+    player.trade(board, computers);
     std::vector<unsigned char> playerDice = board.rollDice();
     unsigned char firstMoverCount = playerDice[0] + playerDice[1];
     player::Player* mover = &player;
@@ -93,14 +105,4 @@ int main(void) {
         else
             mover = &computers[++moverIndex];
     }
-}
-
-unsigned char getPlayersInGame(player::Player& mainPlayer, std::vector<player::Player>& computers) {
-    unsigned char playersStillInGame = 0;
-    if (mainPlayer.inGame)
-        playersStillInGame++;
-    for (player::Player& player : computers)
-        if (player.inGame)
-            playersStillInGame++;
-    return playersStillInGame;
 }
