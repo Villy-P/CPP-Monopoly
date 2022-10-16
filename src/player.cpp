@@ -270,7 +270,7 @@ bool player::Player::ownsColorSet(std::string color) {
 
 unsigned char player::Player::ownedRailroads() {
     unsigned char result = 0;
-    for (plot::Plot p : this->ownedPlots)
+    for (plot::Plot& p : this->ownedPlots)
         if (functions::setContains(p.flags, "RAILROAD"))
             result++;
     return result;
@@ -278,7 +278,7 @@ unsigned char player::Player::ownedRailroads() {
 
 unsigned char player::Player::ownedUtilities() {
     unsigned char result = 0;
-    for (plot::Plot p : this->ownedPlots)
+    for (plot::Plot& p : this->ownedPlots)
         if (functions::setContains(p.flags, "UTILITYSQUARE"))
             result++;
     return result;
@@ -330,8 +330,7 @@ void player::Player::payRentOnProperty(plot::Plot& nextPlot, board::Board& board
 }
 
 void player::Player::payRentOnRailroad(plot::Plot& nextPlot, board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers, player::Player& whoOwns, bool payTwice) {
-    unsigned char ownedRailroads = this->ownedRailroads();
-    switch (ownedRailroads) {
+    switch (this->ownedRailroads()) {
         case 1:
             this->reduceMoney(payTwice ? nextPlot.intProperties.at("RENT") * 2 : nextPlot.intProperties.at("RENT"), board, mainPlayer, computers, true, whoOwns);
             whoOwns.cash += payTwice ? nextPlot.intProperties.at("RENT") * 2 : nextPlot.intProperties.at("RENT");
@@ -357,7 +356,7 @@ void player::Player::payRentOnUtility(plot::Plot& nextPlot, board::Board& board,
         whoOwns.cash += (dieRoll[0] + dieRoll[1]) * timesAmount;
         return;
     }
-    unsigned char ownedUtilities = this->ownedRailroads();
+    unsigned char ownedUtilities = this->ownedUtilities();
     if (ownedUtilities == 1) {
         this->reduceMoney((dieRoll[0] + dieRoll[1]) * 4, board, mainPlayer, computers, true, whoOwns);
         whoOwns.cash += (dieRoll[0] + dieRoll[1]) * 4;
@@ -532,6 +531,7 @@ void player::Player::getOutOfJail(board::Board& board, Player& mainPlayer, std::
 
 void player::Player::playerMenu(board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers) {
     while (true) {
+        functions::clear();
         functions::printlnCyan("1: Buy Houses");
         functions::printlnCyan("2: Buy Hotels");
         functions::printlnCyan("3: View Opponents");
@@ -861,7 +861,7 @@ void player::Player::displayOpponents(board::Board& board, std::vector<player::P
         if (!p.inGame)
             continue;
         functions::printlnBlue(p.name);
-        functions::printlnMagenta("Located at " + board.getPlot(p.plotPosition).stringProperties.at("COLORCODE") + board.getPlot(p.plotPosition).stringProperties.at("NAMW") + functions::ANSI_RESET);
+        functions::printlnMagenta("Located at " + board.getPlot(p.plotPosition).stringProperties.at("COLORCODE") + board.getPlot(p.plotPosition).stringProperties.at("NAME") + functions::ANSI_RESET);
         functions::printlnYellow("Cash: " + p.cash);
         if (p.inJail)
             functions::printlnRed(p.name + " is in jail.");
