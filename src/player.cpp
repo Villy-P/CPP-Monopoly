@@ -33,7 +33,7 @@ void player::Player::movePlayer(board::Board& board, player::Player& mainPlayer,
     std::string nextSquareColor = board.getPlot(this->plotPosition + squaresToMove).stringProperties.at("COLORCODE");
     std::string nextSquareName = board.getPlot(this->plotPosition + squaresToMove).stringProperties.at("NAME");
     std::string nextSquareText = board.getPlot(this->plotPosition + squaresToMove).stringProperties.at("TEXT");
-    plot::Plot nextPlot = board.getPlot(this->plotPosition + squaresToMove);
+    plot::Plot* nextPlot = &board.getPlot(this->plotPosition + squaresToMove);
     functions::printlnBlue(this->name + " rolled:");
     std::cout << "+---+ +---+" << std::endl;
     std::cout << "| " << std::to_string(dieRoll[0]) << " | | " << std::to_string(dieRoll[1]) << " |" << std::endl;
@@ -45,8 +45,8 @@ void player::Player::movePlayer(board::Board& board, player::Player& mainPlayer,
     std::cout << "| " << currentSquareName << "    " << currentSquareText << " |" << std::endl;
     std::cout << "+" << std::string(currentSquareName.length() + currentSquareText.length() + 6, '-') << "+" << functions::ANSI_RESET << std::endl;
     std::cout << "To" << std::endl;
-    std::cout << " " << functions::ANSI_GREEN << std::string(nextPlot.intProperties.at("HOUSES"), 'O') << functions::ANSI_RESET;
-    std::cout << " " << functions::ANSI_RED << std::string(nextPlot.intProperties.at("HOTELS"), 'O') << functions::ANSI_RESET << std::endl;
+    std::cout << " " << functions::ANSI_GREEN << std::string(nextPlot->intProperties.at("HOUSES"), 'O') << functions::ANSI_RESET;
+    std::cout << " " << functions::ANSI_RED << std::string(nextPlot->intProperties.at("HOTELS"), 'O') << functions::ANSI_RESET << std::endl;
     std::cout << nextSquareColor << "+" << std::string(nextSquareName.length() + nextSquareText.length() + 6, '-') << "+" << std::endl;
     std::cout << "| " << nextSquareName << "    " << nextSquareText << " |" << std::endl;
     std::cout << "+" << std::string(nextSquareName.length() + nextSquareText.length() + 6, '-') << "+" << functions::ANSI_RESET << std::endl;
@@ -57,7 +57,7 @@ void player::Player::movePlayer(board::Board& board, player::Player& mainPlayer,
             this->cash += 200;
         }
     }
-    this->landOnSquare(nextPlot, board, mainPlayer, computers, cardManager, dieRoll);
+    this->landOnSquare(*nextPlot, board, mainPlayer, computers, cardManager, dieRoll);
     if (this->plotPosition + squaresToMove < board.plots.size())
         this->plotPosition += squaresToMove;
     else
