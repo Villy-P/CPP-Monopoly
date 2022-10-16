@@ -819,7 +819,7 @@ void player::Player::mortgageProperty() {
 void player::Player::unmortgageProperty() {
     functions::clear();
     for (int i = 0; i < this->ownedPlots.size(); i++) {
-        std::cout << std::to_string(i + 1) << this->ownedPlots[i].stringProperties.at("COLORCODE") << this->ownedPlots[i].stringProperties.at("NAME") << " which is";
+        std::cout << std::to_string(i + 1) << ": " << this->ownedPlots[i].stringProperties.at("COLORCODE") << this->ownedPlots[i].stringProperties.at("NAME") << " which is";
         std::cout << (functions::setContains(this->ownedPlots[i].flags, "MORTGAGED") ? " mortgaged." : " unmortgaged.") << " It has a mortgage value of $";
         std::cout << std::to_string(this->ownedPlots[i].intProperties.at("UNMORTGAGEVALUE")) << functions::ANSI_RESET << std::endl;
     }
