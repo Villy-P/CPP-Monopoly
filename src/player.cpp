@@ -811,8 +811,9 @@ void player::Player::mortgageProperty() {
         this->mortgageProperty();
     }
     this->ownedPlots[input - 1].flags.insert("MORTGAGED");
-    this->cash += this->ownedPlots[input - 1].intProperties.at("MORTGAGEDVALUE");
+    this->cash += this->ownedPlots[input - 1].intProperties.at("MORTGAGEVALUE");
     functions::printlnGreen("You have mortgaged that property.");
+    functions::readStringInput("");
 }
 
 void player::Player::unmortgageProperty() {
@@ -838,6 +839,7 @@ void player::Player::unmortgageProperty() {
     this->ownedPlots[input - 1].flags.erase("MORTGAGED");
     this->cash -= this->ownedPlots[input - 1].intProperties.at("UNMORTGAGEVALUE");
     functions::printlnGreen("You have unmortgaged that property.");
+    functions::readStringInput("");
 }
 
 void player::Player::displayTitleCards() {
@@ -847,7 +849,7 @@ void player::Player::displayTitleCards() {
     for (plot::Plot& p : this->ownedPlots) {
         if (functions::setContains(p.flags, "PROPERTYSQUARE")) {
             p.displayTitleCard();
-            std::cout << "This property has " << p.stringProperties.at("HOUSES") << " houses and " << p.stringProperties.at("HOTELS") << " hotels" << std::endl;
+            std::cout << "This property has " << p.intProperties.at("HOUSES") << " houses and " << p.intProperties.at("HOTELS") << " hotels" << std::endl;
         } else if (functions::setContains(p.flags, "RAILROAD")) {
             p.displayRailroadCard();
         } else {
@@ -864,13 +866,13 @@ void player::Player::displayOpponents(board::Board& board, std::vector<player::P
             continue;
         functions::printlnBlue(p.name);
         functions::printlnMagenta("Located at " + board.getPlot(p.plotPosition).stringProperties.at("COLORCODE") + board.getPlot(p.plotPosition).stringProperties.at("NAME") + functions::ANSI_RESET);
-        functions::printlnYellow("Cash: " + p.cash);
+        functions::printlnBlue("Cash: " + std::to_string(p.cash));
         if (p.inJail)
             functions::printlnRed(p.name + " is in jail.");
         functions::printlnCyan(p.name + " owns:");
         for (plot::Plot& plt : this->ownedPlots) {
             std::cout << plt.stringProperties.at("COLORCODE") << plt.stringProperties.at("NAME") << functions::ANSI_RESET;
-            std::cout << " that has " << plt.stringProperties.at("HOUSES") << " houses and " << plt.stringProperties.at("HOTELS") << " hotels" << std::endl;
+            std::cout << " that has " << plt.intProperties.at("HOUSES") << " houses and " << plt.intProperties.at("HOTELS") << " hotels" << std::endl;
         }
         functions::readStringInput("");
     }
