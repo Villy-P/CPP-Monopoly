@@ -842,6 +842,8 @@ void player::Player::unmortgageProperty() {
 
 void player::Player::displayTitleCards() {
     functions::clear();
+    if (this->ownedPlots.size() == 0)
+        functions::printlnRed("You have no properties.");
     for (plot::Plot& p : this->ownedPlots) {
         if (functions::setContains(p.flags, "PROPERTYSQUARE")) {
             p.displayTitleCard();
