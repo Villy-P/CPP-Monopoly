@@ -419,8 +419,6 @@ void player::Player::buyPropertySegment(plot::Plot& nextPlot, board::Board& boar
 
 void player::Player::landOnSquare(plot::Plot& nextPlot, board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers, card_managment::CardManagment& cardManager, std::vector<unsigned char> dieRoll) {
     std::cout << this->name << " landed on " << nextPlot.stringProperties.at("COLORCODE") << nextPlot.stringProperties.at("NAME") << functions::ANSI_RESET << std::endl;
-    for (std::string s : nextPlot.flags)
-        std::cout << "WOW " << s << std::endl;
     if (functions::setContains(nextPlot.flags, "PROPERTYSQUARE") || functions::setContains(nextPlot.flags, "RAILROAD") || functions::setContains(nextPlot.flags, "UTILITYSQUARE")) {
         if (!functions::setContains(nextPlot.flags, "OWNEDPLOT"))
             this->buyPropertySegment(nextPlot, board, mainPlayer, computers);
@@ -677,13 +675,13 @@ void player::Player::trade(board::Board& board, std::vector<player::Player>& com
         }
         plotsToRecieve.push_back(&whoToTradeTo->ownedPlots[plotToRecieve - 1]);
     }
-    int howManyCardsToGive;
+    int howManyCardsToGive = 0;
     if (this->getOutOfJailFreeCards > 0) {
         functions::printlnMagenta("You have " + std::to_string(this->getOutOfJailFreeCards) + " get out of jail free cards.");
         functions::printlnBlue("How many do you want to trade?");
         howManyCardsToGive = functions::readIntInput(">", 0, this->getOutOfJailFreeCards);
     }
-    int howManyCardsToRecieve;
+    int howManyCardsToRecieve = 0;
     if (whoToTradeTo->getOutOfJailFreeCards > 0) {
         functions::printlnMagenta("He has " + std::to_string(whoToTradeTo->getOutOfJailFreeCards) + " get out of jail free cards.");
         functions::printlnBlue("How many do you want to trade?");
