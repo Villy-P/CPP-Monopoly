@@ -542,7 +542,7 @@ void player::Player::playerMenu(board::Board& board, player::Player& mainPlayer,
         functions::printlnCyan("8: Sell Houses");
         functions::printlnCyan("9: Sell Hotels");
         functions::printlnCyan("10: Roll/End Turn");
-        switch (functions::readIntInput(">", 1, 9)) {
+        switch (functions::readIntInput(">", 1, 10)) {
             case 1:
                 this->buyHouse(board, mainPlayer, computers);
                 break;
