@@ -7,6 +7,11 @@
 * [Tutorials Point](https://www.tutorialspoint.com/index.htm)
 * [Techie Delight](https://www.techiedelight.com/)
 
+## Languages used
+
+* C++
+* Header++
+
 ## Setup
 
 First, you must activate ANSI escape sequences.
