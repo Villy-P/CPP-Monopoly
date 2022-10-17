@@ -116,3 +116,5 @@ Then it `define`s `SRC_FUNCTIONS_H_`.
 At the end of the file, it stops the `#ifndef`.
 Then, when the `.hpp` file is included again, it will fail the `#ifndef` check, so the file will not run.
 This is so that the functions within a header file will not be defined multiple times, but can be used multiple times.
+
+Then we create a `namespace` that is called 1
