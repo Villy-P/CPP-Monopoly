@@ -11,7 +11,8 @@
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe",
                 "-static-libgcc",
-                "-static-libstdc++"
+                "-static-libstdc++",
+                "-static"
             ],
             "options": {
                 "cwd": "C:\\msys64\\mingw64\\bin"
