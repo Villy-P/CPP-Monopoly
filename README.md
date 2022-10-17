@@ -457,3 +457,49 @@ return returnString;
 ```
 
 This essentialy gets the user input using `std::cin`.
+
+The we clear the screen and ask the users how many computers they want to play against using these function:
+
+``` cpp
+bool functions::tryParse(std::string &input, int &output) {
+    try {
+        output = stoi(input);
+    } catch (std::invalid_argument) {
+        return false;
+    }
+    return true;
+}
+
+int functions::readIntInput(std::string prompt, int min, int max) {
+    std::string input;
+    std::cout << prompt;
+    int x;
+    std::getline(std::cin, input);
+    while (!tryParse(input, x) || x < min || x > max) {
+        std::cout << "Enter a number between " << min << " & " << max << ">";
+        std::getline(std::cin, input);
+    }
+    return x;
+}
+```
+
+First, we store the input as a string.
+Then we call `tryParse`.
+This will check if the user inputted an integer.
+To do that it uses a `try-catch` block.
+First it tries to do everything in the `try` block.
+If any exeptions occur, it jumps to the `catch` block.
+In the `try` block, we convert the output into an integer using `stoi`.
+If it can't do that (say the input is `asdfoasj`), then we return `false`.
+Otherwise, we return `true`.
+Back to our `while` loop, we also check if the number is in the range specified.
+Then, back in our `main` functions, we create all those computers.
+You may notice that I use `unsigned char` instead of `int`.
+Take this table:
+
+| Name          | Bits | Range                     |
+| char          | 1    | -128 to 127 / 0 to 255    |
+| unsigned char | 1    | 0 to 255                  |
+| signed char   | 1    | -128 to 127               |
+| int           | 4    | -2147483648 to 2147483647 |
+| unsigned int  | 4
