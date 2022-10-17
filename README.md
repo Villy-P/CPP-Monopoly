@@ -360,3 +360,100 @@ Then, we loop over each flag and property and add it to their respective variabl
 
 Flags will be used to identify what the card will do.
 For example, in our card above, we known that, since `MONEYCHANGE` is in the flags, that the user's cash will be changed.
+
+After that, we call `shuffleDecks()`:
+
+``` cpp
+std::default_random_engine rng = std::default_random_engine {};
+std::shuffle(this->chanceCards.begin(), this->chanceCards.end(), rng);
+std::shuffle(std::begin(this->chestCards), std::end(this->chestCards), rng);
+```
+
+This does, exactly what it says it does, shuffles both decks.
+First it creates a `default_random_engine`.
+Then it shuffles the deck by getting the beggining and end of the decks, as well as the `"random"` part.
+
+Then we create a new `board` and call `createPlots`:
+
+``` cpp
+std::ifstream plotData("plotData.txt");
+plot::Plot plot({}, {}, {});
+if (plotData.is_open()) {
+    while (plotData.good()) {
+        std::string next;
+        std::getline(plotData, next); // Get [FLAGS]
+        std::getline(plotData, next); // Get first flag (OR STRING_PROPERTIES)
+        while (next != "[STRING_PROPERTIES]") {
+            plot.flags.insert(next);
+            std::getline(plotData, next);
+        }
+        std::getline(plotData, next);
+        while (next != "[INT_PROPERTIES]") {
+            std::vector<std::string> split = functions::split(next, '=');
+            if (split[0] == "COLORCODE") {
+                if (split[1] == "WHITE")
+                    split[1] = functions::ANSI_WHITE;
+                else if (split[1] == "BROWN")
+                    split[1] = functions::ANSI_BROWN;
+                else if (split[1] == "DARK_CYAN")
+                    split[1] = functions::ANSI_DARK_CYAN;
+                else if (split[1] == "CYAN")
+                    split[1] = functions::ANSI_CYAN;
+                else if (split[1] == "ORANGE")
+                    split[1] = functions::ANSI_ORANGE;
+                else if (split[1] == "MAGENTA")
+                    split[1] = functions::ANSI_MAGENTA;
+                else if (split[1] == "YELLOW")
+                    split[1] = functions::ANSI_YELLOW;
+                else if (split[1] == "RED")
+                    split[1] = functions::ANSI_RED;
+                else if (split[1] == "BLUE")
+                    split[1] = functions::ANSI_BLUE;
+                else if (split[1] == "GREEN")
+                    split[1] = functions::ANSI_GREEN;
+            }
+            plot.stringProperties.insert({{split[0], split[1]}});
+            std::getline(plotData, next);
+        }
+        std::getline(plotData, next);
+        while (next != "-NEWPLOT-") {
+            std::vector<std::string> split = functions::split(next, '=');
+            plot.intProperties.insert({{split[0], stoi(split[1])}});
+            getline(plotData, next);
+        }
+        this->plots.push_back(plot);
+        plot = plot::Plot{{}, {}, {}};
+    }
+} else {
+    functions::printlnRed("FATAL ERROR. CANNOT FIND OR READ FILE NAMED PLOTDATA.TXT");
+    functions::printlnRed("PLEASE CHECK THAT THE FILE EXISTS WITHIN THE SAME DIRECTORY AS MAIN.EXE AND CHECK FILE PERMISSIONS");
+    functions::readStringInput("PRESS ENTER TO ABORT.");
+    exit(0);
+}
+```
+
+This is essentialy the exact same as the create cards file, so I won't go over it.
+
+Since every plot is different, we need to use `FLAGS` and properties.
+
+Then we create a new player.
+The `true` within the parenthesis is a parameter, basically saying that this will be the main player.
+
+Then we print the intro:
+
+``` cpp
+functions::printlnBlue("Welcome to Monopoly!");
+functions::printlnGreen("What is your name?");
+player.name = functions::readStringInput(">");
+```
+
+In order to get the name, we call this function:
+
+``` cpp
+std::string returnString;
+std::cout << prompt;
+std::getline(std::cin, returnString);
+return returnString;
+```
+
+This essentialy gets the user input using `std::cin`.
