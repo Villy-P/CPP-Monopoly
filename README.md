@@ -294,3 +294,69 @@ Another variable is occupying the next space, so C++ has to manually move the me
 |          d          |
 +---------------------+
 ```
+
+Here, we start an `std::ifstream` called `cardData`.
+We pass in the folder name to read there.
+
+Then, we initialize an empty card to add to the vector.
+The first `if` is to check if the file is valid.
+Then we start a `while` loop that continues until the end of file.
+
+Here is an example of a card:
+
+``` txt
+-NEWCARD-
+TYPE=CHANCE
+DESC=ADVANCE TO THE NEXT RAILROAD. If UNOWNED, you may buy it from the Bank. If OWNED, pay the owner twice the rent to which they are otherwise entitled. IF YOU PASS GO, COLLECT $200
+[FLAGS]
+MOVETONEXTRAILROAD
+PAYDOUBLEIFOWNED
+COLLECTGOCASH
+[PROPERTIES]
+-NEWCARD-
+TYPE=CHANCE
+DESC=SPEEDING FINE. PAY $15.
+[FLAGS]
+MONEYCHANGE
+[PROPERTIES]
+MONEYCHANGE=-15
+```
+
+First we say to create a new card.
+
+``` cpp
+std::string next;
+std::getline(cardData, next);
+```
+
+The first line is to store the current line.
+Then we use `getline` to get the first line.
+
+After that, we check if the card is a chance card.
+We do this by splitting the line that contains the TYPE.
+We split it by the `=` sign, then get the last word found, which is either `CHEST` or `CHANCE`.
+Here is our `split()` function:
+
+``` cpp
+std::vector<std::string> functions::split(const std::string &s, char delim) {
+    std::stringstream ss(s);
+    std::string item;
+    std::vector<std::string> elems;
+    while (getline(ss, item, delim))
+        elems.push_back(item);
+    return elems;
+}
+```
+
+Our arguments are a string, and a delimiter.
+The `&` next to the `s` means that we will be passing in a *reference* to the string.
+First we initialize a `stringstream`.
+Then we create a variable that stores the current object.
+After that we create a vector of all the split words.
+Then, we push every item to that array, and return the vector.
+
+Back to our functions, we then get the next line, and set the description to what we found.
+Then, we loop over each flag and property and add it to their respective variables.
+
+Flags will be used to identify what the card will do.
+For example, in our card above, we known that, since `MONEYCHANGE` is in the flags, that the user's cash will be changed.
