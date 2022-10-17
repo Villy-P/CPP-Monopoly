@@ -557,6 +557,7 @@ void player::Player::playerMenu(board::Board& board, player::Player& mainPlayer,
                 break;
             case 5:
                 this->trade(board, computers);
+                break;
             case 6:
                 this->mortgageProperty();
                 break;
@@ -564,10 +565,10 @@ void player::Player::playerMenu(board::Board& board, player::Player& mainPlayer,
                 this->unmortgageProperty();
                 break;
             case 8:
-                this->sellHotel();
+                this->sellHouse(board);
                 break;
             case 9:
-                this->sellHouse(board);
+                this->sellHotel();
                 break;
             case 10:
                 return;
@@ -603,24 +604,13 @@ void player::Player::trade(board::Board& board, std::vector<player::Player>& com
     std::cout << leftRightAdjust("$" + std::to_string(this->cash), "$" + std::to_string(whoToTradeTo->cash), columns) << std::endl;
     std::cout << std::endl;
     std::cout << leftRightAdjust("PROPERTIES:", "PROPERTIES:", columns) << std::endl;
-    std::vector<std::vector<std::string>> properties;
-    for (int i = 0; i < this->ownedPlots.size(); i++)
-        properties[i][0] = this->ownedPlots[i].stringProperties.at("COLORCODE") + this->ownedPlots[i].stringProperties.at("NAME") + functions::ANSI_RESET;
-    for (int i = 0; i < whoToTradeTo->ownedPlots.size(); i++)
-        properties[i][1] = whoToTradeTo->ownedPlots[i].stringProperties.at("COLORCODE") + whoToTradeTo->ownedPlots[i].stringProperties.at("NAME") + functions::ANSI_RESET;
-    for (std::vector<std::string> vec : properties) {
-        std::string firstValue, secondValue;
-        try {
-            firstValue = vec[0];
-        } catch (...) {
-            firstValue = "";
-        } try {
-            secondValue = vec[1];
-        } catch (...) {
-            secondValue = "";
-        }
-        std::cout << leftRightAdjust(firstValue, secondValue, columns) << std::endl;
+    
+    std::vector<plot::Plot>* smallest = &(this->ownedPlots.size() >= whoToTradeTo->ownedPlots.size() ? whoToTradeTo->ownedPlots : this->ownedPlots);
+    for (int i = 0; i < smallest->size(); i++) {
+        std::cout << leftRightAdjust(this->ownedPlots[i].stringProperties.at("NAME"), whoToTradeTo->ownedPlots[i].stringProperties.at("NAME"), columns) << std::endl;
     }
+    std::cout << leftRightAdjust("others...", "others...", columns) << std::endl;
+
     std::cout << std::endl;
     std::cout << leftRightAdjust(std::to_string(this->getOutOfJailFreeCards) + " get out of jail free cards.", std::to_string(whoToTradeTo->getOutOfJailFreeCards) + " get out of jail free cards.", columns) << std::endl;
     functions::printlnMagenta("First, enter how much money you want to give in the trade. You can just enter 0 if you only want to trade properties and get out of jail free cards.");
@@ -631,7 +621,7 @@ void player::Player::trade(board::Board& board, std::vector<player::Player>& com
     int cashToRecieve = functions::readIntInput(">", 0, whoToTradeTo->cash);
     functions::printlnMagenta("Alright, here are your properties: ");
     for (int i = 0; i < this->ownedPlots.size(); i++)
-        std::cout << std::to_string(i + 1) << this->ownedPlots[i].stringProperties.at("COLORCODE") << this->ownedPlots[i].stringProperties.at("NAME") << functions::ANSI_RESET << std::endl;
+        std::cout << std::to_string(i + 1) << ": " << this->ownedPlots[i].stringProperties.at("COLORCODE") << this->ownedPlots[i].stringProperties.at("NAME") << functions::ANSI_RESET << std::endl;
     std::vector<plot::Plot*> plotsToGive;
     std::vector<int> plotsToGiveIndex;
     functions::printlnCyan("Select properties to give");
@@ -654,7 +644,7 @@ void player::Player::trade(board::Board& board, std::vector<player::Player>& com
     }
     functions::printlnMagenta("Alright, here are his properties: ");
     for (int i = 0; i < whoToTradeTo->ownedPlots.size(); i++)
-        std::cout << std::to_string(i + 1) << whoToTradeTo->ownedPlots[i].stringProperties.at("COLORCODE") << whoToTradeTo->ownedPlots[i].stringProperties.at("NAME") << functions::ANSI_RESET << std::endl;
+        std::cout << std::to_string(i + 1) << ": " << whoToTradeTo->ownedPlots[i].stringProperties.at("COLORCODE") << whoToTradeTo->ownedPlots[i].stringProperties.at("NAME") << functions::ANSI_RESET << std::endl;
     std::vector<plot::Plot*> plotsToRecieve;
     std::vector<int> plotsToRecieveIndex;
     functions::printlnCyan("Select properties to recieve");
@@ -701,7 +691,7 @@ void player::Player::trade(board::Board& board, std::vector<player::Player>& com
     int isCorrect = functions::readIntInput("Enter 0 to back out of the trade and 1 to offer the trade.", 0, 1);
     if (isCorrect == 0)
         return;
-    if (this->moneyInTrade(cashToGive, plotsToGive, howManyCardsToGive) <= this->moneyInTrade(cashToRecieve, plotsToRecieve, howManyCardsToRecieve)) {
+    if (this->moneyInTrade(cashToGive, plotsToGive, howManyCardsToGive) >= this->moneyInTrade(cashToRecieve, plotsToRecieve, howManyCardsToRecieve)) {
         functions::printlnRed(whoToTradeTo->name + " accepted your trade!");
         functions::readStringInput("");
         whoToTradeTo->cash += cashToGive;
@@ -756,7 +746,7 @@ void player::Player::sellHouse(board::Board& board) {
     if (input == 0)
         return;
     if (this->ownedPlots[input - 1].intProperties.at("HOUSES") == 0) {
-        functions::printlnRed("That proeprty has no houses. Try again.");
+        functions::printlnRed("That property has no houses. Try again.");
         functions::readStringInput("");
         this->sellHouse(board);
     }
@@ -776,7 +766,7 @@ void player::Player::sellHouse(board::Board& board) {
 void player::Player::sellHotel() {
     functions::clear();
     for (int i = 0; i < this->ownedPlots.size(); i++) {
-        std::cout << std::to_string(i + 1) << ": " << this->ownedPlots[i].stringProperties.at("COLORCODE") << this->ownedPlots[i].stringProperties.at("NAME") << "that has ";
+        std::cout << std::to_string(i + 1) << ": " << this->ownedPlots[i].stringProperties.at("COLORCODE") << this->ownedPlots[i].stringProperties.at("NAME") << " that has ";
         std::cout << std::to_string(this->ownedPlots[i].intProperties.at("HOTELS")) << " hotels." << " A hotel there costs $";
         std::cout << std::to_string(this->ownedPlots[i].intProperties.at("HOTELSCOST")) << functions::ANSI_RESET << std::endl;
     }
