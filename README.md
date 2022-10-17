@@ -1,5 +1,9 @@
 # CPP-Monopoly
 
+2080 lines of code written by me.
+934 lines of data written by me.
+141 lines of code not written by me.
+
 ## Sources
 
 * [Stack Overflow](https://stackoverflow.com/)
