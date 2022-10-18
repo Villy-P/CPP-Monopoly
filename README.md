@@ -497,9 +497,23 @@ Then, back in our `main` functions, we create all those computers.
 You may notice that I use `unsigned char` instead of `int`.
 Take this table:
 
-| Name          | Bits | Range                     |
-| char          | 1    | -128 to 127 / 0 to 255    |
-| unsigned char | 1    | 0 to 255                  |
-| signed char   | 1    | -128 to 127               |
-| int           | 4    | -2147483648 to 2147483647 |
-| unsigned int  | 4
+| Name                         | Bits | Range                           |
+|------------------------------|------|---------------------------------|
+| char                         | 1    | -128 to 127 / 0 to 255          |
+| unsigned char                | 1    | 0 to 255                        |
+| signed char                  | 1    | -128 to 127                     |
+| int / signed int             | 4    | -2147483648 to 2147483647       |
+| unsigned int                 | 4    | 0 to 4294967295                 |
+| short int / signed short int | 2    | -32768 to 32767                 |
+| unsigned short int           | 2    | 0 to 65,535                     |
+| long int / signed long int   | 8    | -2,147,483,648 to 2,147,483,647 |
+| unsigned long int            | 8    | 0 to 4,294,967,295              |
+| long long int                | 8    | -(2^63) to (2^63)-1             |
+| unsigned long long int       | 8    | 0 to 18,446,744,073,709,551,615 |
+
+Since I know that `i` will never be as large as an `int`, I can save 3 bytes.
+In reality, it does not matter.
+
+Then, we add that many computers to a vector.
+We also set their names.
+Then we clear the screen.
