@@ -827,3 +827,43 @@ bool player::Player::ownsColorSet(std::string color) {
 
 First, we store the number of times a plot in the color set appears.
 Then, we loop over each plot.
+If the plots color code matches the color provided and the plot is a property, we add one to matching.
+
+At the end, if the color is `brown` or `blue`, we return if the matching value was two.
+This is because those color sets only have 2 streets on them.
+Otherwise we return if the matching value was three.
+
+Back to buying houses, if we do not own any color sets, then we tell the player that they cannot and return.
+
+Then, we split the process of buying houses between computers and players.
+
+If the player is the main player, we first print out each item in the owned plots.
+Then we get the player input.
+If it is 0 we exit.
+Otherwise, we first check if the player owns the color set of the plot that they selected.
+If not we go to the start of the function.
+Then, if the property has the `MORTGAGED` flag, we stop.
+Then we call this function:
+
+``` cpp
+bool player::Player::canBuyHouseOnPlot(plot::Plot& plot) {
+    for (plot::Plot& p : this->ownedPlots) {
+        if (
+            !(p.stringProperties.at("COLORCODE") == plot.stringProperties.at("COLORCODE") && 
+            p.intProperties.at("HOUSES") == plot.intProperties.at("HOUSES") ||
+            p.intProperties.at("HOUSES") - 1 == plot.intProperties.at("HOUSES"))
+        )
+            return false;
+    }
+    return true;
+}
+```
+
+Here we check if we are building houses equally.
+
+If not, we stop.
+Then, if the property already has four houses we stop.
+We also stop if there is a hotel.
+Finally, we stop if the player cannot afford the property.
+
+If all these tests fail, we increase the number of houses on that property

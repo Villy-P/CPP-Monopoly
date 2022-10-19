@@ -888,13 +888,18 @@ void player::Player::buyHotel(board::Board& board, player::Player& mainPlayer, s
         for (int i = 0; i < this->ownedPlots.size(); i++) {
             std::cout << this->ownedPlots[i].stringProperties.at("COLORCODE") << std::to_string(i + 1) << ": " << this->ownedPlots[i].stringProperties.at("NAME");
             std::cout << " with " << std::to_string(this->ownedPlots[i].intProperties.at("HOUSES")) << " houses.";
-            std::cout << " A hotel there costs " << std::to_string(this->ownedPlots[i].intProperties.at("HOTELSCOST")) << functions::ANSI_RESET << std::endl;
+            if (functions::setContains(this->ownedPlots[i].flags, "PROPERTYSQUARE"))
+                std::cout << " A hotel there costs " << std::to_string(this->ownedPlots[i].intProperties.at("HOTELSCOST")) << functions::ANSI_RESET << std::endl;
         }
         functions::printlnRed("Enter 0 to exit");
         int input = functions::readIntInput(">", 0, this->ownedPlots.size());
         if (input == 0)
             return;
-        if (!this->ownsColorSet(this->ownedPlots[input - 1].stringProperties.at("COLORCODE"))) {
+        if (functions::setContains(this->ownedPlots[input - 1].flags, "PROPERTYSQUARE")) {
+            functions::printlnRed("That is not a property.");
+            functions::readStringInput("");
+            this->buyHouse(board, mainPlayer, computers);
+        } else if (!this->ownsColorSet(this->ownedPlots[input - 1].stringProperties.at("COLORCODE"))) {
             functions::printlnRed("You do not own that color set.");
             functions::readStringInput("");
             this->buyHotel(board, mainPlayer, computers);
@@ -917,6 +922,7 @@ void player::Player::buyHotel(board::Board& board, player::Player& mainPlayer, s
     } else {
         for (plot::Plot& p : this->ownedPlots) {
             if (
+                functions::setContains(p.flags, "PROPERTYSQUARE") &&
                 this->ownsColorSet(p.stringProperties.at("COLORCODE")) &&
                 this->canBuyHotelOnPlot(p) &&
                 p.intProperties.at("HOTELS") != 1 &&
@@ -944,13 +950,18 @@ void player::Player::buyHouse(board::Board& board, player::Player& mainPlayer, s
         for (int i = 0; i < this->ownedPlots.size(); i++) {
             std::cout << this->ownedPlots[i].stringProperties.at("COLORCODE") << std::to_string(i + 1) << ": " << this->ownedPlots[i].stringProperties.at("NAME");
             std::cout << " with " << std::to_string(this->ownedPlots[i].intProperties.at("HOUSES")) << " houses.";
-            std::cout << " A house there costs " << std::to_string(this->ownedPlots[i].intProperties.at("HOUSESCOST")) << functions::ANSI_RESET << std::endl;
+            if (functions::setContains(this->ownedPlots[i].flags, "PROPERTYSQUARE"))
+                std::cout << " A house there costs " << std::to_string(this->ownedPlots[i].intProperties.at("HOUSESCOST")) << functions::ANSI_RESET << std::endl;
         }
         functions::printlnRed("Enter 0 to exit");
         int input = functions::readIntInput(">", 0, this->ownedPlots.size());
         if (input == 0)
             return;
-        if (!this->ownsColorSet(this->ownedPlots[input - 1].stringProperties.at("COLORCODE"))) {
+        if (functions::setContains(this->ownedPlots[input - 1].flags, "PROPERTYSQUARE")) {
+            functions::printlnRed("That is not a property.");
+            functions::readStringInput("");
+            this->buyHouse(board, mainPlayer, computers);
+        } else if (!this->ownsColorSet(this->ownedPlots[input - 1].stringProperties.at("COLORCODE"))) {
             functions::printlnRed("You do not own that color set.");
             functions::readStringInput("");
             this->buyHouse(board, mainPlayer, computers);
@@ -980,6 +991,7 @@ void player::Player::buyHouse(board::Board& board, player::Player& mainPlayer, s
     } else {
         for (plot::Plot& p : this->ownedPlots) {
             if (
+                functions::setContains(p.flags, "PROPERTYSQUARE") &&
                 !functions::setContains(p.flags, "MORTGAGED") &&
                 this->ownsColorSet(p.stringProperties.at("COLORCODE")) &&
                 this->canBuyHouseOnPlot(p) &&
