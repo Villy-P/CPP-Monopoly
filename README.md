@@ -517,3 +517,156 @@ In reality, it does not matter.
 Then, we add that many computers to a vector.
 We also set their names.
 Then we clear the screen.
+
+After that, we get the players identifier.
+In order to do that, we call this function:
+
+``` cpp
+std::string functions::readCharInput(std::string prompt) {
+    std::string returnString;
+    std::cout << prompt;
+    std::getline(std::cin, returnString);
+    while (returnString.length() != 1) {
+        std::cout << "Enter a character>";
+        std::getline(std::cin, returnString);
+    }
+    return returnString;
+}
+```
+
+This is almost the same as the string functions, except that we check if the length of the string is one.
+
+Then, since we don't want a computer to have the same identifier as the player, we remove that item from the array:
+
+``` cpp
+computerIdentifiers.erase(std::remove(computerIdentifiers.begin(), computerIdentifiers.end(), player.identifier), computerIdentifiers.end());
+```
+
+Here, we remove the item from the array by getting it's `beginning` and `end`.
+
+We then clear the screen.
+Then we get the color of the player:
+
+``` cpp
+std::string colorMenu() {
+    std::cout << "Next, pick a color!" << std::endl;
+    functions::printlnRed("1: Red");
+    functions::printlnGreen("2: Green");
+    functions::printlnYellow("3: Yellow");
+    functions::printlnBlue("4: Blue");
+    functions::printlnMagenta("5: Magenta");
+    functions::printlnCyan("6: Cyan");
+    switch (functions::readIntInput(">", 1, 6)) {
+        case 1:     return functions::ANSI_RED;
+        case 2:     return functions::ANSI_GREEN;
+        case 3:     return functions::ANSI_YELLOW;
+        case 4:     return functions::ANSI_BLUE;
+        case 5:     return functions::ANSI_MAGENTA;
+        case 6:     return functions::ANSI_CYAN;
+    }
+    return functions::ANSI_WHITE;
+}
+```
+
+First, we print out all the options.
+Then we run a `switch` on the player's input.
+A `switch` is sort of like a switch.
+Each `case` will check if the switched item is equal to that.
+If it is, then we run whatever is there.
+
+After that, we set the identifier color to what the player chose.
+
+Then we list out the computers that the player will be going against.
+
+After that, we have each player roll dice to determine who will go first:
+
+``` cpp
+std::vector<unsigned char> playerDice = board.rollDice();
+unsigned char firstMoverCount = playerDice[0] + playerDice[1];
+player::Player* mover = &player;
+unsigned char moverIndex = 0;
+for (unsigned char i = 0; i < computerNumber; i++) {
+    std::vector<unsigned char> dice = board.rollDice();
+    if (dice[0] + dice[1] > firstMoverCount) {
+        firstMoverCount = dice[0] + dice[1];
+        mover = &computers[i];
+    }
+}
+functions::printlnGreen(mover->name + " will be moving first!");
+functions::readStringInput("");
+```
+
+We first call this functions to get the player's die roll:
+
+``` cpp
+std::vector<unsigned char> board::Board::rollDice() {
+    std::random_device random;
+    std::mt19937 generate(random());
+    std::uniform_int_distribution<> distr(1, 6);
+    unsigned char die1 = distr(generate);
+    unsigned char die2 = distr(generate);
+    std::vector vect{die1, die2};
+    return vect;
+}
+```
+
+Here we generate a random device.
+The `mt19937` is used to generate a seed for the random number generator.
+Then we set the range from `1-6`.
+Then we generate two random numbers between that range, add them to a vector, then return it.
+
+Back to `main()`, we add the two items of the vector together to get the total die roll.
+Since we know that the player has the highest die roll *so far*, we can set the current highest die roller to `player`.
+
+And here is where we introduce `pointers`.
+
+``` cpp
+int num = 100;
+```
+
+Here we create a new number, and assign it to `100`.
+When we create this variable, memory is allocated to store the variable:
+
+``` c
+// This is C
+int* num = (int*) malloc(sizeof(int));
+```
+
+Here, we allocate 4 bytes of memory for an int known as `num`.
+Here, we can see pointers at work.
+
+``` c
+int num = 100;
+int* ptr = &num;
+
+printf("%d\n", num);
+printf("%p\n", ptr);
+```
+
+This will print `100` and then the memory location of num.
+The `*` defines a pointer variable, and the `&` gets the memory location of the variable.
+
+Here, we want to store the memory location of the player that will be moving first.
+This is because if we *didn't*, we would just be storing a copy of the player.
+If we ever want to change a member variable, say the players `cash`, it would assign it to the copy, not the original object.
+In more *modern* languages, the language will do it for you.
+Take Java.
+You have your primitives (`'boolean''float', 'double', 'char', 'int', 'long'`).
+You also have your non-primitives (`'String', any user created class, arrays`).
+Primitives will always be passed by value.
+Non-primitives will be passed by their memory location.
+This is why in `Java`, you need to use `.equals` instead of `==`:
+`==` will match the memory locations of the objects:
+
+``` cpp
+&obj1 == &obj2
+```
+
+Where `.equals` will match the content of the item.
+
+Then we store the index of the mover's index (location of the computer moving).
+Then we loop over each computer and check if the die roll is greater than the current largest roll.
+After that, we print the name of the player moving first.
+The empty `readStringInput()` is used as a stopping point, so that the player can specify when to continue.
+Then we start an infinite loop.
+First we call a functions that checks if there is only one player in the game.
