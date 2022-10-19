@@ -253,17 +253,17 @@ void player::Player::computerBankruptcy(board::Board& board, std::vector<player:
     functions::printlnCyan(this->name + " has gone bankrupt.");
     this->inGame = false;
     if (doesOwe)
-        for (plot::Plot p : this->ownedPlots)
+        for (plot::Plot& p : this->ownedPlots)
             oweTo.ownedPlots.push_back(p);
     else
-        for (plot::Plot p : this->ownedPlots)
+        for (plot::Plot& p : this->ownedPlots)
             p.auction(board, mainPlayer, computers);
 }
 
 bool player::Player::ownsColorSet(std::string color) {
     unsigned char matching = 0;
-    for (plot::Plot p : this->ownedPlots)
-        if (p.stringProperties.at("COLORCODE") == color && !functions::setContains(p.flags, "PROPERTYSQUARE"))
+    for (plot::Plot& p : this->ownedPlots)
+        if (p.stringProperties.at("COLORCODE") == color && functions::setContains(p.flags, "PROPERTYSQUARE"))
             matching++;
     return color == "BROWN" || color == "BLUE" ? matching == 2 : matching == 3;
 }

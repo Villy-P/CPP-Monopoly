@@ -668,5 +668,162 @@ Then we store the index of the mover's index (location of the computer moving).
 Then we loop over each computer and check if the die roll is greater than the current largest roll.
 After that, we print the name of the player moving first.
 The empty `readStringInput()` is used as a stopping point, so that the player can specify when to continue.
+
 Then we start an infinite loop.
 First we call a functions that checks if there is only one player in the game.
+If so we print that the player has won.
+`exit(0)` stops the program completely.
+
+Then, if the mover is the main player (i.e. you), then we call this function:
+
+``` cpp
+void player::Player::playerMenu(board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers) {
+    while (true) {
+        functions::clear();
+        functions::printlnCyan("1: Buy Houses");
+        functions::printlnCyan("2: Buy Hotels");
+        functions::printlnCyan("3: View Opponents");
+        functions::printlnCyan("4: View Title Cards");
+        functions::printlnCyan("5: Trade with computers");
+        functions::printlnCyan("6: Mortgage property");
+        functions::printlnCyan("7: Unmortgage property");
+        functions::printlnCyan("8: Sell Houses");
+        functions::printlnCyan("9: Sell Hotels");
+        functions::printlnCyan("10: Roll/End Turn");
+        switch (functions::readIntInput(">", 1, 10)) {
+            case 1:
+                this->buyHouse(board, mainPlayer, computers);
+                break;
+            case 2:
+                this->buyHotel(board, mainPlayer, computers);
+                break;
+            case 3:
+                this->displayOpponents(board, computers);
+                break;
+            case 4:
+                this->displayTitleCards();
+                break;
+            case 5:
+                this->trade(board, computers);
+                break;
+            case 6:
+                this->mortgageProperty();
+                break;
+            case 7:
+                this->unmortgageProperty();
+                break;
+            case 8:
+                this->sellHouse(board);
+                break;
+            case 9:
+                this->sellHotel();
+                break;
+            case 10:
+                return;
+        }
+    }
+}
+```
+
+You can think of this as an interlude menu.
+Something that the player will see before and after they roll their die.
+
+Let's go over each option:
+
+## Buying a house
+
+``` cpp
+void player::Player::buyHouse(board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers) {
+    if (!this->canBuyBuilding()) {
+        if (this->isMainPlayer) {
+            functions::printlnRed("You do not own any color sets");
+            functions::readStringInput("");
+        }
+        return;
+    }
+    if (this->isMainPlayer) {
+        for (int i = 0; i < this->ownedPlots.size(); i++) {
+            std::cout << this->ownedPlots[i].stringProperties.at("COLORCODE") << std::to_string(i + 1) << ": " << this->ownedPlots[i].stringProperties.at("NAME");
+            std::cout << " with " << std::to_string(this->ownedPlots[i].intProperties.at("HOUSES")) << " houses.";
+            std::cout << " A house there costs " << std::to_string(this->ownedPlots[i].intProperties.at("HOUSESCOST")) << functions::ANSI_RESET << std::endl;
+        }
+        functions::printlnRed("Enter 0 to exit");
+        int input = functions::readIntInput(">", 0, this->ownedPlots.size());
+        if (input == 0)
+            return;
+        if (!this->ownsColorSet(this->ownedPlots[input - 1].stringProperties.at("COLORCODE"))) {
+            functions::printlnRed("You do not own that color set.");
+            functions::readStringInput("");
+            this->buyHouse(board, mainPlayer, computers);
+        } else if (functions::setContains(this->ownedPlots[input - 1].flags, "MORTGAGED")) {
+            functions::printlnRed("That property is mortgaged.");
+            functions::readStringInput("");
+            this->buyHouse(board, mainPlayer, computers);
+        } else if (!this->canBuyHouseOnPlot(this->ownedPlots[input - 1])) {
+            functions::printlnRed("You must build houses equally.");
+            functions::readStringInput("");
+            this->buyHouse(board, mainPlayer, computers);
+        } else if (this->ownedPlots[input - 1].intProperties.at("HOUSES") == 4) {
+            functions::printlnRed("You already have 4 houses there. Build a hotel instead.");
+            functions::readStringInput("");
+            this->buyHouse(board, mainPlayer, computers);
+        } else if (this->ownedPlots[input - 1].intProperties.at("HOTELS") == 1) {
+            functions::printlnRed("You already have a hotel there.");
+            functions::readStringInput("");
+            this->buyHouse(board, mainPlayer, computers);
+        } else if (this->cash < this->ownedPlots[input - 1].intProperties.at("HOUSESCOST")) {
+            functions::printlnRed("You can't afford a house there.");
+            functions::readStringInput("");
+            this->buyHouse(board, mainPlayer, computers);
+        }
+        this->ownedPlots[input - 1].intProperties.at("HOUSES") += 1;
+        this->reduceMoney(this->ownedPlots[input - 1].intProperties.at("HOUSESCOST"), board, mainPlayer, computers, false, mainPlayer);
+    } else {
+        for (plot::Plot& p : this->ownedPlots) {
+            if (
+                !functions::setContains(p.flags, "MORTGAGED") &&
+                this->ownsColorSet(p.stringProperties.at("COLORCODE")) &&
+                this->canBuyHouseOnPlot(p) &&
+                p.intProperties.at("HOUSES") != 4 &&
+                p.intProperties.at("HOTELS") != 1 &&
+                this->cash >= p.intProperties.at("HOUSESCOST")
+            ) {
+                functions::printlnBlue(this->name + " bought a house on " + p.stringProperties.at("NAME"));
+                p.intProperties.at("HOUSES") += 1;
+                this->reduceMoney(p.intProperties.at("HOUSESCOST"), board, mainPlayer, computers, false, mainPlayer);
+                return;
+            }
+        }
+    }
+}
+```
+
+First, we call this function:
+
+``` cpp
+bool player::Player::canBuyBuilding() {
+    for (plot::Plot& p : this->ownedPlots)
+        if (this->ownsColorSet(p.stringProperties.at("COLORCODE")))
+            return true;
+    return false;
+}
+```
+
+Here we loop over each of the players owned plots, and checks if they own the color set.
+If they own at least one color set, we know they *can* buy a house there.
+Each plot has a collection of string properties, such as their `name` and their `color`.
+The `.at()` is used to get the value of the key that we pass in.
+Here is the function to see if we own the color set:
+
+``` cpp
+bool player::Player::ownsColorSet(std::string color) {
+    unsigned char matching = 0;
+    for (plot::Plot& p : this->ownedPlots)
+        if (p.stringProperties.at("COLORCODE") == color && functions::setContains(p.flags, "PROPERTYSQUARE"))
+            matching++;
+    return color == "BROWN" || color == "BLUE" ? matching == 2 : matching == 3;
+}
+```
+
+First, we store the number of times a plot in the color set appears.
+Then, we loop over each plot.
