@@ -869,8 +869,8 @@ bool player::Player::canBuyHouseOnPlot(plot::Plot& plot) {
 Here we check if we are building houses equally.
 
 If not, we stop.
-Then, if the property already has four houses we stop.
 We also stop if there is a hotel.
+Then, if the property already has four houses we stop.
 Finally, we stop if the player cannot afford the property.
 
 If all these tests fail, we increase the number of houses on that property
