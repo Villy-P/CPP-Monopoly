@@ -745,13 +745,18 @@ void player::Player::buyHouse(board::Board& board, player::Player& mainPlayer, s
         for (int i = 0; i < this->ownedPlots.size(); i++) {
             std::cout << this->ownedPlots[i].stringProperties.at("COLORCODE") << std::to_string(i + 1) << ": " << this->ownedPlots[i].stringProperties.at("NAME");
             std::cout << " with " << std::to_string(this->ownedPlots[i].intProperties.at("HOUSES")) << " houses.";
-            std::cout << " A house there costs " << std::to_string(this->ownedPlots[i].intProperties.at("HOUSESCOST")) << functions::ANSI_RESET << std::endl;
+            if (functions::setContains(this->ownedPlots[i].flags, "PROPERTYSQUARE"))
+                std::cout << " A house there costs " << std::to_string(this->ownedPlots[i].intProperties.at("HOUSESCOST")) << functions::ANSI_RESET << std::endl;
         }
         functions::printlnRed("Enter 0 to exit");
         int input = functions::readIntInput(">", 0, this->ownedPlots.size());
         if (input == 0)
             return;
-        if (!this->ownsColorSet(this->ownedPlots[input - 1].stringProperties.at("COLORCODE"))) {
+        if (functions::setContains(this->ownedPlots[input - 1].flags, "PROPERTYSQUARE")) {
+            functions::printlnRed("That is not a property.");
+            functions::readStringInput("");
+            this->buyHouse(board, mainPlayer, computers);
+        } else if (!this->ownsColorSet(this->ownedPlots[input - 1].stringProperties.at("COLORCODE"))) {
             functions::printlnRed("You do not own that color set.");
             functions::readStringInput("");
             this->buyHouse(board, mainPlayer, computers);
@@ -781,6 +786,7 @@ void player::Player::buyHouse(board::Board& board, player::Player& mainPlayer, s
     } else {
         for (plot::Plot& p : this->ownedPlots) {
             if (
+                functions::setContains(p.flags, "PROPERTYSQUARE") &&
                 !functions::setContains(p.flags, "MORTGAGED") &&
                 this->ownsColorSet(p.stringProperties.at("COLORCODE")) &&
                 this->canBuyHouseOnPlot(p) &&
@@ -840,8 +846,9 @@ Then, we split the process of buying houses between computers and players.
 If the player is the main player, we first print out each item in the owned plots.
 Then we get the player input.
 If it is 0 we exit.
-Otherwise, we first check if the player owns the color set of the plot that they selected.
+Otherwise, we first check if the property selected is a property and not a railroad/utility.
 If not we go to the start of the function.
+Then, we check if the player owns the color set of the plot that they selected.
 Then, if the property has the `MORTGAGED` flag, we stop.
 Then we call this function:
 
@@ -867,3 +874,5 @@ We also stop if there is a hotel.
 Finally, we stop if the player cannot afford the property.
 
 If all these tests fail, we increase the number of houses on that property
+Then we call the `reduceMoney()` method.
+This method is extremely complicated, so I'll go over it later.
