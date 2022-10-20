@@ -875,4 +875,257 @@ Finally, we stop if the player cannot afford the property.
 
 If all these tests fail, we increase the number of houses on that property
 Then we call the `reduceMoney()` method.
-This method is extremely complicated, so I'll go over it later.
+
+Then, if the player is a computer, we check if the opposite of all the above methods are true.
+If so, we know we can buy a new house, so we do it.
+
+No, lets go over the `reduceMoney()` method.
+This method is used to reduce the amount of money a player has.
+
+First we do this:
+
+``` cpp
+if (!this->inGame)
+    return;
+```
+
+Here we check if the player is still in the game.
+If not, we return.
+
+Then, we check if the player cannot pay the amount.
+If so, we then check if the player is the main player.
+Then, we print that you cannot buy that property.
+We then set up a `label` called `canMakeMoney`.
+We can use the keyword `goto` to go to this label at any time.
+We check if the player can gather the money by calling this function:
+
+``` cpp
+int player::Player::moneyCanMake() {
+    int cashAvailable = this->cash;
+    for (plot::Plot& p : this->ownedPlots) {
+        cashAvailable += (p.intProperties.at("HOTELSCOST") / 2) * p.intProperties.at("HOTELS");
+        cashAvailable += (p.intProperties.at("HOUSESCOST") / 2) * p.intProperties.at("HOUSES");
+        cashAvailable += p.intProperties.at("UNMORTGAGEVALUE");
+    }
+    return cashAvailable;
+}
+```
+
+First we store the amount of cash we have.
+Then, we loop over each plot and calculate the total cash that can be gathered by selling buildings or mortgaging then.
+
+This is used to check how much money the player *can* make.
+
+Back to our `reduceMoney()` method,  if we can't make the money to pay off our debt, we then check if the player can trade their get out of jail free cards.
+
+We get the money that the player wants to trade them for, then get a "pity" value for the computers.
+If the computer is feeling generous enough, he will trade money for the cards.
+
+If we can't make the money, we print some stuff then exit the program.
+
+Now back a few steps, we now know the player can get the money.
+So, we first start a sort of "while" loop with labels.
+Then, we loop over all the plots the player has, and they can either sell buildings or mortgage property.
+They do that until they have the cash, then we subtract the amount from the cash, then return.
+
+If the player is a computer, we first check if he has get out of jail card, and see if the player will trade for it.
+If he didn't have any cards then we start selling buildings and mortgaging properties.
+
+If he goes bankrupt, we call this function:
+
+``` cpp
+void player::Player::computerBankruptcy(board::Board& board, std::vector<player::Player>& computers, player::Player& mainPlayer, bool doesOwe, player::Player& oweTo) {
+    functions::printlnCyan(this->name + " has gone bankrupt.");
+    this->inGame = false;
+    if (doesOwe)
+        for (plot::Plot& p : this->ownedPlots)
+            oweTo.ownedPlots.push_back(p);
+    else
+        for (plot::Plot& p : this->ownedPlots)
+            p.auction(board, mainPlayer, computers);
+}
+```
+
+So here, we check if the computer owes someone.
+If so we add all the owned properties to the person who the computer owes.
+Otherwise, we auction off all the computers properties.
+
+To auction, we call this function:
+
+``` cpp
+void plot::Plot::auction(board::Board& board, player::Player& player, std::vector<player::Player>& computers) {
+    player.bid = 0;
+    player.isBidding = true;
+    for (player::Player& c : computers) {
+        c.bid = 0;
+        c.isBidding = true;
+    }
+    std::cout << "Bidding has started on the property " << this->stringProperties.at("COLORCODE") << this->stringProperties.at("NAME") << functions::ANSI_RESET << std::endl;
+    player::Player* highestBidder = &player;
+    while (this->playersStillBidding(computers, player)) {
+        functions::printlnBlue("The bid has passed to you. You can either (1) enter a new bid, or (2) stop bidding.");
+        int input = functions::readIntInput(">", 1, 2);
+        if (input == 1) {
+            functions::printlnMagenta("The current bid is $" + std::to_string(highestBidder->bid) + ". You have $" + std::to_string(player.cash));
+            functions::printlnMagenta("You may go over your cash, however you mush raise the money to pay and may end up going bankrupt.");
+            input = functions::readIntInput(">", highestBidder->bid + 1, std::numeric_limits<int>::max());
+            highestBidder = &player;
+            player.bid = input;
+        } else {
+            functions::printlnRed("You have stopped bidding.");
+            player.isBidding = false;
+        }
+        functions::readStringInput(">");
+        for (player::Player& p : computers) {
+            if (p.isBidding && p.inGame) {
+                if (p.cash <= highestBidder->bid || highestBidder->bid > this->intProperties.at("PRICE") + 30 || p.cash <= this->intProperties.at("PRICE") + 30) {
+                    functions::printlnRed(p.name + " has stopped bidding.");
+                    p.isBidding = false;
+                } else {
+                    p.bid = highestBidder->bid + 30;
+                    highestBidder = &p;
+                    functions::printlnRed(p.name + " has raised the bid to $" + std::to_string(p.bid));
+                }
+            }
+        }
+    }
+    functions::printlnGreen("The auction has ended!");
+    functions::printlnBlue(highestBidder->name + " is the highest bidder at $" + std::to_string(highestBidder->bid));
+    highestBidder->reduceMoney(highestBidder->bid, board, player, computers, false, player);
+    highestBidder->buyProperty(*this, board, player, computers);
+}
+```
+
+First off, we reset all the bids.
+Then, we loop over each player and get their bid until all but one stops.
+Then, we call this function to buy the function:
+
+``` cpp
+void player::Player::buyProperty(plot::Plot& nextPlot, board::Board& board, player::Player& mainPlayer, std::vector<player::Player>& computers) {
+    if (functions::setContains(nextPlot.flags, "PROPERTYSQUARE"))
+        nextPlot.displayTitleCard();
+    else if (functions::setContains(nextPlot.flags, "RAILROAD"))
+        nextPlot.displayRailroadCard();
+    else
+        nextPlot.displayUtilityCard();
+    this->ownedPlots.push_back(nextPlot);
+    nextPlot.flags.insert("OWNEDPLOT");
+    this->cash -= nextPlot.intProperties.at("PRICE");
+    nextPlot.stringProperties["OWNER"] = this->name;
+    functions::readStringInput("");
+}
+```
+
+First, we get which type of property type it is.
+Then, we display the appropriate title card.
+I won't go over these methods, but will go over two methods that are used to display strings:
+
+``` cpp
+std::string leftRightAdjust(std::string leftContent, std::string rightContent, int length) {
+    return " " + leftContent + std::string(length - 2 - leftContent.length() - rightContent.length(), ' ') + rightContent + " ";
+}
+```
+
+Here are printing two strings, seperated by spaces in order to print them at a certain length.
+We also have this function:
+
+``` cpp
+std::string center(const std::string s, const int w) {
+    std::stringstream ss, spaces;
+    int pad = w - s.size();
+    for (int i = 0; i < pad / 2; ++i)
+        spaces << " ";
+    ss << spaces.str() << s << spaces.str();
+    if (pad > 0 && pad % 2 != 0)
+        ss << " ";
+    return ss.str();
+}
+```
+
+Here, we center a string on a certain length.
+
+Ok, so back a lot of steps, we return to the player menu.
+Our next step is to buy hotels.
+This is the exact same as buying houses, with a few changes, so I won't go over it.
+
+After that, we have two functions that are used to display the properties of our opponents and ourselves.
+These are quite self-explanitory, so I won't go over them.
+
+After that, we have a function that deals with trades.
+
+First, we get the computer the player wants to trade with.
+Then, get the dimensions of the console using this function:
+
+``` cpp
+std::vector<int> functions::getConsoleDimensions() {
+    CONSOLE_SCREEN_BUFFER_INFO info;
+    std::vector<int> dimensions;
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info);
+    dimensions.push_back(info.srWindow.Right - info.srWindow.Left + 1);
+    dimensions.push_back(info.srWindow.Bottom - info.srWindow.Top + 1);
+    return dimensions;
+}
+```
+
+If you were wondering why this project is windows only, this is why.
+
+After that, we display the properies of each player.
+Then, we get the amount of cash, properties, and get out of jail free cards that the player wants to trade.
+Then, we check if the player is making a logical trade, and if so, we finalize the trade.
+
+After that, we have functions to mortgage/unmortgage properties:
+
+``` cpp
+void player::Player::mortgageProperty() {
+    functions::clear();
+    for (int i = 0; i < this->ownedPlots.size(); i++) {
+        std::cout << std::to_string(i + 1) << ": " << this->ownedPlots[i].stringProperties.at("COLORCODE") << this->ownedPlots[i].stringProperties.at("NAME") << " which is";
+        std::cout << (functions::setContains(this->ownedPlots[i].flags, "MORTGAGED") ? " mortgaged." : " unmortgaged.") << " It has a mortgage value of $";
+        std::cout << std::to_string(this->ownedPlots[i].intProperties.at("MORTGAGEVALUE")) << functions::ANSI_RESET << std::endl;
+    }
+    functions::printlnRed("Enter 0 to exit");
+    int input = functions::readIntInput(">", 0, this->ownedPlots.size());
+    if (input == 0)
+        return;
+    if (functions::setContains(this->ownedPlots[input - 1].flags, "MORTGAGED")) {
+        functions::printlnRed("That property is already mortgaged. Try unmortgaging it.");
+        functions::readStringInput("");
+        this->mortgageProperty();
+    }
+    this->ownedPlots[input - 1].flags.insert("MORTGAGED");
+    this->cash += this->ownedPlots[input - 1].intProperties.at("MORTGAGEVALUE");
+    functions::printlnGreen("You have mortgaged that property.");
+    functions::readStringInput("");
+}
+
+void player::Player::unmortgageProperty() {
+    functions::clear();
+    for (int i = 0; i < this->ownedPlots.size(); i++) {
+        std::cout << std::to_string(i + 1) << ": " << this->ownedPlots[i].stringProperties.at("COLORCODE") << this->ownedPlots[i].stringProperties.at("NAME") << " which is";
+        std::cout << (functions::setContains(this->ownedPlots[i].flags, "MORTGAGED") ? " mortgaged." : " unmortgaged.") << " It has a mortgage value of $";
+        std::cout << std::to_string(this->ownedPlots[i].intProperties.at("UNMORTGAGEVALUE")) << functions::ANSI_RESET << std::endl;
+    }
+    functions::printlnRed("Enter 0 to exit");
+    int input = functions::readIntInput(">", 0, this->ownedPlots.size());
+    if (input == 0)
+        return;
+    if (functions::setContains(this->ownedPlots[input - 1].flags, "UNMORTGAGE")) {
+        functions::printlnRed("That property is already unmortgaged.");
+        functions::readStringInput("");
+        this->unmortgageProperty();
+    } else if (this->cash < this->ownedPlots[input - 1].intProperties.at("UNMORTGAGEVALUE")) {
+        functions::printlnRed("You can't afford that!.");
+        functions::readStringInput("");
+        this->unmortgageProperty();
+    }
+    this->ownedPlots[input - 1].flags.erase("MORTGAGED");
+    this->cash -= this->ownedPlots[input - 1].intProperties.at("UNMORTGAGEVALUE");
+    functions::printlnGreen("You have unmortgaged that property.");
+    functions::readStringInput("");
+}
+```
+
+Here, we get the player's input on which property they want to mortgage/unmortgage.
+
+Then, if we are mortgaging a property, we get the money associated with it.
+otherwise, we pay the money needed.
