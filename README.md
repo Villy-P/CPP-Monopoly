@@ -1128,4 +1128,11 @@ void player::Player::unmortgageProperty() {
 Here, we get the player's input on which property they want to mortgage/unmortgage.
 
 Then, if we are mortgaging a property, we get the money associated with it.
-otherwise, we pay the money needed.
+Otherwise, we pay the money needed.
+
+Then, we have two functions that sell buildings, which is the opposite of the previous functions to buy buildings.
+
+Later we call the `movePlayer()` function  which prints out the players die roll and move the player.
+All those functions are in the `player.cpp` file.
+
+Thanks!
